@@ -6,9 +6,9 @@ Projekt powstał pierwotnie na mój własny użytek i jest obecnie rozwijany jak
 
 ## Aktualna wersja
 
-**v0.7.2 — Public Beta**
+**v0.8 — Public Beta**
 
-AstroPlanner umożliwia m.in. planowanie sesji, prowadzenie projektów i dziennika, definiowanie własnego sprzętu i profili, korzystanie z katalogów DSO oraz wykonywanie backupu danych.
+AstroPlanner umożliwia m.in. planowanie sesji, śledzenie celu integracji i postępu projektu, prowadzenie edytowalnego dziennika, definiowanie własnego sprzętu i profili, korzystanie z katalogów DSO oraz wykonywanie backupu danych.
 
 ## Aplikacja
 

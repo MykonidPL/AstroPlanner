@@ -1,4 +1,4 @@
-AstroPlanner v0.7.2 — Public Beta
+AstroPlanner v0.8 — Public Beta
 
 Aktualizacja istniejącego GitHub Pages:
 1. W repo AstroPlanner wybierz Upload files.
