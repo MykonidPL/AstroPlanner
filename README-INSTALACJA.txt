@@ -1,17 +1,8 @@
-AstroPlanner v0.6
+AstroPlanner v0.7
 
-Aktualizacja:
-1. Podmień index.html, manifest.webmanifest i service-worker.js w repo AstroPlanner.
-2. Commit bezpośrednio do main.
-3. Poczekaj na GitHub Pages i odśwież aplikację.
+Aktualizacja istniejącego repo GitHub Pages:
+1. Podmień index.html, manifest.webmanifest i service-worker.js.
+2. Commit do main.
+3. Poczekaj na deploy GitHub Pages i odśwież aplikację.
 
-Nowości v0.6:
-- brak sztucznego narzutu między każdą klatką; dithering co N + settle
-- zakładki Planer / Projekty / Dziennik / Sprzęt
-- teleskopy, kamery i filtry jako lokalne presety
-- gain i temperatura
-- zebrane / odrzucone / zaakceptowane LIGHT
-- Journal z notatkami i automatycznym Księżycem
-- cele per filtr
-- rozbudowana kalibracja z setupem
-- migracja projektów z v0.5
+Najważniejsze zmiany: profile setupów, Evostar 72ED, korektory/flattener, własne obiekty, Start/Zakończ sesję, automatyczny Dziennik, biblioteka darków, lokalizacje, backup JSON.

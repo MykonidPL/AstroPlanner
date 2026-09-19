@@ -1,7 +1,7 @@
 {
-  "name": "AstroPlanner v0.6",
+  "name": "AstroPlanner",
   "short_name": "AstroPlanner",
-  "description": "Planner i dziennik sesji astrofotograficznych z projektami, sprzętem, filtrami, katalogiem DSO i kalibracją.",
+  "description": "Planner i dziennik sesji astrofotograficznych.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
