@@ -4,9 +4,9 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.9.3 — Public Beta**
+**v0.9.5 — Public Beta**
 
-Wersja 0.9.3 upraszcza workflow: projekty są ekranem głównym, Planner opisuje niebo, a dane sprzętowe zapisuje się dopiero wraz z ukończoną sesją. Dziennik grupuje historię według projektów.
+Wersja 0.9.5 upraszcza workflow: projekty są ekranem głównym, Planner opisuje niebo, a dane sprzętowe zapisuje się dopiero wraz z ukończoną sesją. Dziennik grupuje historię według projektów.
 
 ## Aplikacja
 
@@ -22,6 +22,11 @@ AstroPlanner © 2026 Mykonid. Kod źródłowy nie jest udostępniany na licencji
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 
-### Poprawka 0.9.3
+### Poprawka 0.9.4
 
 Poprawiono usuwanie projektów z historią. Projekt z zapisanymi sesjami można zachować jako ukończony albo trwale usunąć razem z przypisanymi sesjami.
+
+
+### Poprawka 0.9.5
+
+Planner nie wymaga wyboru projektu, poprawiono przeglądanie katalogów na ekranie dotykowym, dodano ocenę widoczności obiektu i rozbudowane informacje o Księżycu. Zmieniono również ikonę aplikacji.
