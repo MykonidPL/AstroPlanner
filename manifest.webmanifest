@@ -1,7 +1,7 @@
 {
   "name": "AstroPlanner",
   "short_name": "AstroPlanner",
-  "description": "Offline planner sesji astrofotograficznych, log LIGHT i klatek kalibracyjnych.",
+  "description": "Offline planner sesji astrofotograficznych z katalogiem Messier, NGC/IC, LDN, Abell/ACO i A66 oraz logiem LIGHT i kalibracji.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
