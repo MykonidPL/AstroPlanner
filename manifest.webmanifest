@@ -1,7 +1,7 @@
 {
   "name": "AstroPlanner",
   "short_name": "AstroPlanner",
-  "description": "Offline planner sesji astrofotograficznych i log projektów.",
+  "description": "Offline planner sesji astrofotograficznych, log LIGHT i klatek kalibracyjnych.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
