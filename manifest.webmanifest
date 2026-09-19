@@ -1,7 +1,7 @@
 {
   "name": "AstroPlanner",
   "short_name": "AstroPlanner",
-  "description": "Planner i dziennik sesji astrofotograficznych.",
+  "description": "Planowanie i dziennik projektów astrofotograficznych DSO.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

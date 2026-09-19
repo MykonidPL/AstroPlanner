@@ -1,14 +1,12 @@
 # AstroPlanner
 
-AstroPlanner to mobilne narzędzie do planowania i prowadzenia projektów astrofotograficznych DSO.
-
-Projekt powstał pierwotnie na mój własny użytek i jest obecnie rozwijany jako publiczna beta.
+Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.8 — Public Beta**
+**v0.9 — Public Beta**
 
-AstroPlanner umożliwia m.in. planowanie sesji, śledzenie celu integracji i postępu projektu, prowadzenie edytowalnego dziennika, definiowanie własnego sprzętu i profili, korzystanie z katalogów DSO oraz wykonywanie backupu danych.
+Wersja 0.9 upraszcza workflow: projekty są ekranem głównym, Planner opisuje niebo, a dane sprzętowe zapisuje się dopiero wraz z ukończoną sesją. Dziennik grupuje historię według projektów.
 
 ## Aplikacja
 
@@ -16,10 +14,4 @@ https://mykonidpl.github.io/AstroPlanner/
 
 ## Copyright
 
-AstroPlanner © 2026 Mykonid.
-
-Aplikacja jest udostępniana bezpłatnie do użytku osobistego. Kod źródłowy nie jest udostępniany na licencji open source.
-
-Szczegółowe warunki znajdują się w pliku [LICENSE](LICENSE).
-
-**All rights reserved.**
+AstroPlanner © 2026 Mykonid. Kod źródłowy nie jest udostępniany na licencji open source. Szczegóły: [LICENSE](LICENSE).
