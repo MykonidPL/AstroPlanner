@@ -1,10 +1,10 @@
-AstroPlanner v0.7.1
+AstroPlanner v0.7.2 — Public Beta
 
-Aktualizacja istniejącego repo GitHub Pages:
-1. Podmień index.html, manifest.webmanifest i service-worker.js.
-2. Commit do main.
-3. Poczekaj na deploy GitHub Pages i odśwież aplikację.
+Aktualizacja istniejącego GitHub Pages:
+1. W repo AstroPlanner wybierz Upload files.
+2. Podmień index.html, manifest.webmanifest i service-worker.js.
+3. Commit bezpośrednio do main.
+4. Poczekaj na GitHub Pages i odśwież aplikację.
 
-Najważniejsze zmiany: profile setupów, Evostar 72ED, korektory/flattener, własne obiekty, Start/Zakończ sesję, automatyczny Dziennik, biblioteka darków, lokalizacje, backup JSON.
-
-Zmiana 0.7.1: usunięto dwa fabryczne profile setupów. Profile użytkownika pozostają bez zmian.
+© 2026 Mykonid. All rights reserved.
+Szczegółowe warunki: plik LICENSE w repozytorium.
