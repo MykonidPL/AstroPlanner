@@ -1,7 +1,7 @@
 {
-  "name": "AstroPlanner",
+  "name": "AstroPlanner v0.6",
   "short_name": "AstroPlanner",
-  "description": "Offline planner sesji astrofotograficznych z katalogiem Messier, NGC/IC, LDN, Abell/ACO i A66 oraz logiem LIGHT i kalibracji.",
+  "description": "Planner i dziennik sesji astrofotograficznych z projektami, sprzętem, filtrami, katalogiem DSO i kalibracją.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

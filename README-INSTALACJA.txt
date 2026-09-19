@@ -1,19 +1,17 @@
-AstroPlanner v0.5
+AstroPlanner v0.6
 
-Aktualizacja istniejącego repo AstroPlanner:
-1. Wgraj / zastąp: index.html, manifest.webmanifest, service-worker.js.
-2. Commit directly to main.
-3. Odczekaj 1–2 minuty i odśwież GitHub Pages.
-4. Przy pierwszym uruchomieniu z internetem aplikacja doładuje rozszerzony katalog i zapisze go w Cache Storage telefonu.
+Aktualizacja:
+1. Podmień index.html, manifest.webmanifest i service-worker.js w repo AstroPlanner.
+2. Commit bezpośrednio do main.
+3. Poczekaj na GitHub Pages i odśwież aplikację.
 
-Katalog rozszerzony:
-- OpenNGC/IC + Messier
-- LDN, Barnard, LBN, Sharpless 2, vdB, RCW
-- Abell/ACO galaxy clusters
-- Abell PN / A66 1–86
-
-Źródła i licencje:
-OpenNGC: CC BY-SA 4.0
-Stellarium DSO supplement: GPL-2.0-or-later
-SIMBAD A66/Abell PN: ODbL 1.0
-Dane są ładowane z przypiętej wersji Celestia Atlas (commit ef52c7e...) i cache'owane lokalnie.
+Nowości v0.6:
+- brak sztucznego narzutu między każdą klatką; dithering co N + settle
+- zakładki Planer / Projekty / Dziennik / Sprzęt
+- teleskopy, kamery i filtry jako lokalne presety
+- gain i temperatura
+- zebrane / odrzucone / zaakceptowane LIGHT
+- Journal z notatkami i automatycznym Księżycem
+- cele per filtr
+- rozbudowana kalibracja z setupem
+- migracja projektów z v0.5
