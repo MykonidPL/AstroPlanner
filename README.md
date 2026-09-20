@@ -4,9 +4,9 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.10.0 — Public Beta**
+**v0.10.1 — Public Beta**
 
-Wersja 0.10.0 upraszcza workflow: projekty są ekranem głównym, Planner opisuje niebo, a dane sprzętowe zapisuje się dopiero wraz z ukończoną sesją. Dziennik grupuje historię według projektów.
+Wersja 0.10.1 naprawia krytyczny błąd startu w 0.10.0 i zachowuje workflow: projekty są ekranem głównym, Planner opisuje niebo, a dane sprzętowe zapisuje się dopiero wraz z ukończoną sesją. Dziennik grupuje historię według projektów.
 
 ## Aplikacja
 
@@ -34,3 +34,7 @@ Planner nie wymaga wyboru projektu, poprawiono przeglądanie katalogów na ekran
 
 ## v0.10.0
 Porządki UX: statusy projektów, planowane projekty, katalogi, czytelne czasy h/min, zwijane sesje, ISO/DSLR, edycja sprzętu i poprawki GPS.
+
+
+### Poprawka 0.10.1
+Naprawiono krytyczny błąd inicjalizacji powodujący brak działania interfejsu po uruchomieniu v0.10.0.
