@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.10.4.4 — Public Beta**
+**v0.10.5 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,18 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.10.5
+
+- poprawiono logikę terminów projektów planowanych: domyślna data Plannera nie jest terminem projektu, miesiąc i dokładna data są synchronizowane bez sprzecznych wartości, a termin można wyczyścić,
+- dodano opcjonalny **Plan materiału** z osobnymi składnikami (np. Hα/OIII, RGB), ich celami godzinowymi oraz opcjonalnym przypisaniem filtrów,
+- przy Planie materiału łączny cel projektu jest automatycznie sumą celów składników; nie wpisuje się go osobno,
+- dodano postęp każdego składnika, czas pozostały oraz osobny czas zebrany ponad plan; procent postępu nie przekracza 100%,
+- sesje projektów z Planem materiału są przypisywane do konkretnego składnika, z automatyczną podpowiedzią na podstawie filtra,
+- zachowano pełną zgodność ze starszymi projektami bez Planu materiału,
+- dodano pierwszą lokalną bazę sprzętu: katalog 20 kamer ZWO z podstawowymi parametrami sensora, rozdzielczością, pikselem i informacją o chłodzeniu,
+- wybór kamery z katalogu tylko uzupełnia edytowalny formularz; nowy użytkownik nadal startuje z pustą własną biblioteką sprzętu,
+- katalog kamer ZWO jest dołączony do cache PWA i dostępny również offline po instalacji.
 
 ### v0.10.4.4
 

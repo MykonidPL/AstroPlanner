@@ -1,4 +1,4 @@
-const CACHE='astroplanner-v01044';
+const CACHE='astroplanner-v0105';
 const CATALOG_CACHE='astroplanner-catalog-v06';
 const CATALOG_COMMIT='ef52c7ea920191d45fe0da4711dd3b1cc9220c18';
 const CATALOG_ASSETS=[
@@ -6,7 +6,7 @@ const CATALOG_ASSETS=[
   `https://raw.githubusercontent.com/acocalypso/celestia_atlas/${CATALOG_COMMIT}/data/stellarium-dso-supplement.json`,
   `https://raw.githubusercontent.com/acocalypso/celestia_atlas/${CATALOG_COMMIT}/data/abell-pn-catalog.json`
 ];
-const ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
+const ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./zwo-cameras.json'];
 
 async function warmCatalogCache(){
   const cache=await caches.open(CATALOG_CACHE);
