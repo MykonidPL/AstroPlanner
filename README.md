@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.10.6.2 — Public Beta**
+**v0.10.6.3 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,18 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.10.6.3
+
+- dodano opcjonalną **planowaną ekspozycję** do projektu pojedynczego kadru i jako wspólną ekspozycję projektu mozaikowego,
+- składniki **Planu materiału** mogą mieć własne czasy ekspozycji, dzięki czemu np. narrowband i RGB są liczone niezależnie,
+- Planner pokazuje nową sekcję **Klatki w użytecznym oknie**: teoretyczną maksymalną liczbę klatek możliwych do wykonania tej nocy przy zadanej ekspozycji oraz orientacyjną liczbę klatek pozostałych do celu,
+- liczba klatek jest liczona z faktycznego użytecznego okna Plannera; wynik jest jawnie opisany jako maksimum teoretyczne bez ditheringu, autofocusu, meridian flipa i innych przerw,
+- przy tworzeniu nowego projektu obliczenie liczby klatek działa jeszcze przed jego zapisaniem; w projekcie z Planem materiału wspólne pole ekspozycji jest zastępowane ekspozycjami poszczególnych składników,
+- w kartach projektów i rozwijanych panelach/składnikach pokazano planowaną ekspozycję oraz wynikającą z niej minimalną liczbę klatek potrzebną do realizacji celu godzinowego,
+- przy dodawaniu nowej sesji planowana ekspozycja projektu lub wybranego składnika Planu materiału jest automatycznie podpowiadana; edycja istniejącej sesji nie jest nadpisywana,
+- nowe pola są opcjonalne, więc starsze projekty bez planowanej ekspozycji działają bez migracji i zachowują dotychczasowe zachowanie,
+- zaktualizowano numer aplikacji, eksport JSON, manifest, cache PWA, README oraz instrukcję instalacji.
 
 ### v0.10.6.2
 
