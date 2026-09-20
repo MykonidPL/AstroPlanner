@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.10.4 — Public Beta**
+**v0.10.4.1 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,13 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.10.4.1
+
+- naprawiono błąd Plannera, który mógł wykonywać obliczenia dla starych współrzędnych mimo braku aktualnie wybranego obiektu,
+- Planner nie oblicza planu nocy bez świadomie wybranego celu i pokazuje komunikat „Wybierz obiekt, aby obliczyć plan nocy”,
+- unieważnienie celu czyści poprzednie wyniki Plannera, wykres oraz osierocone współrzędne celu,
+- zapis preferencji nie utrwala już współrzędnych jako celu, jeśli żaden obiekt nie jest wybrany.
 
 ### v0.10.4
 
