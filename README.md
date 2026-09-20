@@ -4,9 +4,9 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.10.2 — Public Beta**
+**v0.10.3 — Public Beta**
 
-Wersja 0.10.2 rozwija stabilną bazę 0.10.1: dodaje terminy projektów planowanych, pełniejsze archiwum sesji, bezpieczniejsze dopasowanie materiału kalibracyjnego oraz poprawki integralności danych lokalizacji i statusów projektów.
+Wersja 0.10.3 rozwija stabilną bazę 0.10.2: wzmacnia działanie mobilne/PWA — responsywny wykres, roboczy zapis formularza sesji, czytelny brak nocy astronomicznej, przygotowanie katalogu do pracy offline, jawne błędy GPS oraz ostrzeżenie o lokalnym charakterze danych i backupie.
 
 ## Aplikacja
 
