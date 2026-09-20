@@ -1,7 +1,7 @@
 {
   "name": "AstroPlanner",
   "short_name": "AstroPlanner",
-  "description": "Planowanie i dziennik projektów astrofotograficznych DSO.",
+  "description": "AstroPlanner v0.10.0 — projekty, planowanie i historia sesji astrofotograficznych.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
