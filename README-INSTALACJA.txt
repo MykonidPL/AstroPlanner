@@ -1,2 +1,2 @@
-AstroPlanner v0.10.4.3 — Public Beta
+AstroPlanner v0.10.4.4 — Public Beta
 Wgraj pliki do repozytorium GitHub Pages. Po deployu zamknij i otwórz PWA ponownie.
