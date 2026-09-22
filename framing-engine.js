@@ -75,11 +75,18 @@
     const nextX=cur.x-Number(dxPx)/pixelsPerDegree,nextY=cur.y-Number(dyPx)/pixelsPerDegree;
     return tangentToSky(nextX,nextY,referenceRaDeg,referenceDecDeg);
   }
+  function shiftedViewFromScreenPan(raDeg,decDeg,dxPx,dyPx,pixelsPerDegree){
+    if(!(pixelsPerDegree>0)||!validCoord(raDeg,decDeg))return null;
+    // The sky layer follows the finger visually. To preserve that position after
+    // release, the projection centre must move in the same tangent-plane direction.
+    const nextX=Number(dxPx)/pixelsPerDegree,nextY=Number(dyPx)/pixelsPerDegree;
+    return tangentToSky(nextX,nextY,raDeg,decDeg);
+  }
   function shiftedCenterFromScreenDrag(layout,dxPx,dyPx,pixelsPerDegree,referenceRaDeg,referenceDecDeg){
     if(!layout)return null;
     const refRa=finite(referenceRaDeg)?referenceRaDeg:layout.targetRaDeg;
     const refDec=finite(referenceDecDeg)?referenceDecDeg:layout.targetDecDeg;
     return shiftSkyFromScreenDrag(layout.centerRaDeg,layout.centerDecDeg,refRa,refDec,dxPx,dyPx,pixelsPerDegree);
   }
-  global.AstroFraming={validCoord,projectToTangent,tangentToSky,rotate,planeSizeFromFov,defaultGridForCount,frameCorners,createLayout,shiftSkyFromScreenDrag,shiftedCenterFromScreenDrag,normRa,normRot};
+  global.AstroFraming={validCoord,projectToTangent,tangentToSky,rotate,planeSizeFromFov,defaultGridForCount,frameCorners,createLayout,shiftSkyFromScreenDrag,shiftedViewFromScreenPan,shiftedCenterFromScreenDrag,normRa,normRot};
 })(window);
