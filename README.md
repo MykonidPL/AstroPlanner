@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.11.0 — Public Beta**
+**v0.11.1 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,22 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.11.1
+
+- dodano fundament **Kadrowania** wspólny dla projektów pojedynczego kadru i mozaik; mapa nieba nie jest jeszcze częścią tej wersji,
+- projekt z poprawnym targetem RA/Dec i planowanym setupem automatycznie otrzymuje techniczny podgląd FOV na karcie projektu,
+- pojedynczy kadr może zapisać własny środek RA/Dec i rotację niezależnie od środka obiektu,
+- mozaika korzysta z tego samego silnika kadru: użytkownik ustawia liczbę wierszy i kolumn, overlap oraz rotację całego układu,
+- liczba pól siatki mozaiki musi odpowiadać liczbie istniejących paneli projektu; aplikacja nie tworzy ani nie usuwa paneli podczas kadrowania,
+- po zapisaniu kadru AstroPlanner oblicza i zapisuje RA/Dec środka każdego panelu oraz jego FOV i rotację, bez zmiany nazw i celów czasowych paneli,
+- dodano przesuwanie kadru gestem/przeciągnięciem oraz szybkie wyśrodkowanie na obiekcie i obrót ±90°,
+- geometria korzysta z lokalnej projekcji gnomonicznej/tangent-plane zamiast liniowego przybliżenia RA/Dec,
+- stary projekt bez pola `framing` pozostaje w pełni zgodny: podgląd jest wyliczany domyślnie z targetu i setupu, a dane kadru są zapisywane dopiero przy świadomej zmianie/zapisie,
+- przy zmianie planowanego setupu zapisany środek i rotacja kadru są zachowane, natomiast FOV oraz geometria paneli są przeliczane z aktualnego setupu,
+- kod geometrii i renderera wydzielono do `framing-engine.js` i `framing-renderer.js`, aby kolejne warstwy mapy (gwiazdy i kontury DSO) nie rozbudowywały monolitycznego `index.html`,
+- nowe moduły są częścią cache PWA i działają offline po aktualizacji,
+- zaktualizowano numer aplikacji, eksport JSON, manifest, cache PWA, README oraz instrukcję instalacji.
 
 ### v0.11.0
 
