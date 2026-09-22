@@ -16,7 +16,7 @@
     if(Number.isFinite(Number(o?.m))&&Number(o.m)>0)return`M${Number(o.m)}`;
     const vals=[o?.mapLabel,o?.name,...(Array.isArray(o?.aliases)?o.aliases:[])].filter(Boolean).map(x=>String(x).trim());
     const pats=[/^NGC\s*0*\d+/i,/^IC\s*0*\d+/i,/^LDN\s*0*\d+/i,/^LBN\s*0*\d+/i,/^Sh\s*2[-\s]?0*\d+/i,/^vdB\s*0*\d+/i,/^RCW\s*0*\d+/i,/^(?:Barnard|B)\s*0*\d+/i,/^(?:Abell|ACO)\s*0*\d+/i];
-    for(const re of pats){const v=vals.find(x=>re.test(x));if(v)return v.replace(/\s+/g,' ').replace(/^Sh\s*2\s*/i,'Sh2-');}
+    for(const re of pats){const v=vals.find(x=>re.test(x));if(v)return v.replace(/\s+/g,' ').replace(/^Sh\s*2[-\s]*/i,'Sh2-');}
     const first=vals[0]||'DSO';
     return first.length>28?first.slice(0,27)+'…':first;
   }
@@ -32,6 +32,18 @@
     if(code==='**'||t.includes('podwójn'))return'double-star';
     return'other';
   }
+  function catalogTier(o,label,kind,majorAxisArcmin){
+    if(Number.isFinite(Number(o?.m))&&Number(o.m)>0)return 0;
+    if(o?.custom)return 0;
+    const txt=String(label||'').trim(),groups=Array.isArray(o?.groups)?o.groups.map(x=>String(x).toLowerCase()):[];
+    if(/^M\s*\d+/i.test(txt))return 0;
+    if(/^(?:NGC|IC)\s*\d+/i.test(txt)||groups.includes('openngc'))return 1;
+    if(/^(?:Sh2-|Sh\s*2|vdB|RCW)\s*\d+/i.test(txt))return 2;
+    if(/^(?:Abell|ACO)\s*\d+/i.test(txt))return 2;
+    if(/^(?:LDN|LBN|Barnard|B)\s*\d+/i.test(txt))return 3;
+    if(kind==='galaxy'&&Number(majorAxisArcmin)>=8)return 1;
+    return 2;
+  }
   function normalizeObject(o,i){
     const ra=Number(o?.raDeg),dec=Number(o?.decDeg);if(!finite(ra)||!finite(dec)||dec<-90||dec>90)return null;
     const maj=finite(o?.majorAxisArcmin)&&Number(o.majorAxisArcmin)>0?Number(o.majorAxisArcmin):null;
@@ -39,9 +51,9 @@
     const pa=finite(o?.positionAngleDeg)?((Number(o.positionAngleDeg)%180)+180)%180:null;
     const mag=finite(o?.mag)?Number(o.mag):null;
     const groups=Array.isArray(o?.groups)?o.groups.map(x=>String(x).toLowerCase()):[];
-    const kind=classify(o),label=cleanLabel(o);
-    const priority=(Number.isFinite(Number(o?.m))? -100:0)+(o?.custom?-70:0)+(maj? -Math.min(30,maj/8):0)+(mag!=null?mag:18);
-    return{id:String(o?.uid||o?.id||`${label}:${ra.toFixed(6)}:${dec.toFixed(6)}:${i}`),raDeg:normRa(ra),decDeg:dec,label,name:String(o?.name||label),type:String(o?.type||''),typeCode:String(o?.typeCode||''),kind,mag,majorAxisArcmin:maj,minorAxisArcmin:min,positionAngleDeg:pa,groups,custom:!!o?.custom,m:Number.isFinite(Number(o?.m))?Number(o.m):null,priority};
+    const kind=classify(o),label=cleanLabel(o),detailTier=catalogTier(o,label,kind,maj);
+    const priority=(Number.isFinite(Number(o?.m))? -100:0)+(o?.custom?-70:0)+(detailTier*15)+(maj? -Math.min(30,maj/8):0)+(mag!=null?mag:18);
+    return{id:String(o?.uid||o?.id||`${label}:${ra.toFixed(6)}:${dec.toFixed(6)}:${i}`),raDeg:normRa(ra),decDeg:dec,label,name:String(o?.name||label),type:String(o?.type||''),typeCode:String(o?.typeCode||''),kind,mag,majorAxisArcmin:maj,minorAxisArcmin:min,positionAngleDeg:pa,groups,custom:!!o?.custom,m:Number.isFinite(Number(o?.m))?Number(o.m):null,detailTier,priority};
   }
   function setObjects(objects){
     const next=[],seen=new Set();
@@ -63,12 +75,18 @@
     return out;
   }
   function profile(radiusDeg){
+    // DSO level-of-detail is based on the real angular radius of the map.
+    // symbolTier and labelTier are intentionally different: seeing a marker does not
+    // automatically mean its label deserves screen space. 0=Messier/custom, 1=NGC/IC,
+    // 2=Sh2/vdB/RCW/Abell/other, 3=LDN/LBN/Barnard and similarly dense catalogues.
     const r=Number(radiusDeg)||4;
-    if(r>20)return{limit:70,magLimit:9,unknownMinArcmin:25,labelLimit:7};
-    if(r>10)return{limit:120,magLimit:10.5,unknownMinArcmin:12,labelLimit:10};
-    if(r>5)return{limit:220,magLimit:12.5,unknownMinArcmin:6,labelLimit:14};
-    if(r>2)return{limit:350,magLimit:15,unknownMinArcmin:2,labelLimit:20};
-    return{limit:520,magLimit:20,unknownMinArcmin:0,labelLimit:28};
+    if(r>15)return{limit:45,magLimit:8.5,symbolTier:0,labelTier:0,labelLimit:5,largeArcmin:45,brightMag:6.5,unknownMinArcmin:40};
+    if(r>9)return{limit:70,magLimit:10,symbolTier:1,labelTier:0,labelLimit:6,largeArcmin:35,brightMag:7.5,unknownMinArcmin:25};
+    if(r>6)return{limit:100,magLimit:11.5,symbolTier:1,labelTier:1,labelLimit:8,largeArcmin:25,brightMag:8.5,unknownMinArcmin:16};
+    if(r>4)return{limit:150,magLimit:13,symbolTier:2,labelTier:1,labelLimit:11,largeArcmin:18,brightMag:9.5,unknownMinArcmin:10};
+    if(r>2.2)return{limit:230,magLimit:15.5,symbolTier:2,labelTier:2,labelLimit:15,largeArcmin:10,brightMag:11,unknownMinArcmin:5};
+    if(r>1.1)return{limit:340,magLimit:18,symbolTier:3,labelTier:2,labelLimit:20,largeArcmin:5,brightMag:13,unknownMinArcmin:2};
+    return{limit:520,magLimit:20,symbolTier:3,labelTier:3,labelLimit:28,largeArcmin:0,brightMag:20,unknownMinArcmin:0};
   }
   function query(centerRa,centerDec,radiusDeg){
     if(!records.length||!finite(centerRa)||!finite(centerDec)||!(Number(radiusDeg)>0))return[];
@@ -78,10 +96,11 @@
       const o=records[idx];
       let dra=o.raDeg*D2R-ra0;while(dra>Math.PI)dra-=2*Math.PI;while(dra<-Math.PI)dra+=2*Math.PI;
       const dr=o.decDeg*D2R,cosDist=sin0*Math.sin(dr)+cos0*Math.cos(dr)*Math.cos(dra);if(cosDist<cosLimit)continue;
-      const important=o.m||o.custom||o.majorAxisArcmin!=null;
-      if(o.mag!=null&&o.mag>p.magLimit&&!o.m&&!o.custom)continue;
-      if(o.mag==null&&!important&&radius>5)continue;
-      if(o.mag==null&&o.majorAxisArcmin!=null&&o.majorAxisArcmin<p.unknownMinArcmin&&!o.m&&!o.custom)continue;
+      const isPrimary=!!(o.m||o.custom),large=Number(o.majorAxisArcmin)>=Number(p.largeArcmin||0),bright=o.mag!=null&&Number(o.mag)<=Number(p.brightMag||-99),tierAllowed=Number(o.detailTier||0)<=Number(p.symbolTier||0);
+      if(!isPrimary&&!tierAllowed&&!large&&!bright)continue;
+      if(o.mag!=null&&o.mag>p.magLimit&&!isPrimary&&!large)continue;
+      if(o.mag==null&&o.majorAxisArcmin==null&&!isPrimary&&Number(o.detailTier||9)>Number(p.symbolTier||0))continue;
+      if(o.mag==null&&o.majorAxisArcmin!=null&&o.majorAxisArcmin<p.unknownMinArcmin&&!isPrimary&&!tierAllowed)continue;
       const dist=Math.acos(clamp(cosDist,-1,1))/D2R;out.push({...o,distanceDeg:dist});
     }
     out.sort((a,b)=>a.priority-b.priority||a.distanceDeg-b.distanceDeg||a.label.localeCompare(b.label));

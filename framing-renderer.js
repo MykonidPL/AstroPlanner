@@ -40,9 +40,12 @@
     const pts=(panel.corners||[]).map(c=>projectScreen(c.raDeg,c.decDeg,v)).filter(Boolean);
     return pts.length===4?pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' ')+' Z':'';
   }
-  function starRadius(mag,preview){
-    const base=3.15-.27*(Number(mag)+1),r=clamp(base,.55,3.2);
-    return preview?Math.max(.5,r*.88):r;
+  function starVisual(mag,preview){
+    const m=Number(mag);let r;
+    if(m<=0)r=4.8;else if(m<=1)r=4.2;else if(m<=2)r=3.55;else if(m<=3)r=2.9;else if(m<=4)r=2.3;else if(m<=5)r=1.8;else if(m<=6)r=1.38;else if(m<=7)r=1.02;else if(m<=8)r=.76;else if(m<=9)r=.58;else r=.44;
+    if(preview)r=Math.max(.42,r*.82);
+    const opacity=clamp(.98-Math.max(0,m-1)*.085,.26,.98);
+    return{r,opacity,halo:m<=2.5};
   }
   function starLayer(layout,v,preview){
     const S=global.AstroStarLayer;if(!S||S.getStatus?.().status!=='ready')return{html:'',count:0,limit:null};
@@ -50,10 +53,10 @@
     const stars=S.query(v.viewRaDeg,v.viewDecDeg,radius,limit),parts=[];let visible=0;
     for(const st of stars){
       const sp=projectScreen(st.raDeg,st.decDeg,v);if(!sp)continue;
-      if(sp.x<-5||sp.x>v.width+5||sp.y<-5||sp.y>v.height+5)continue;
-      visible++;const r=starRadius(st.mag,preview),op=clamp(.48+(limit-Number(st.mag))*.055,.46,.94);
-      if(st.mag<=2.2)parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${(r*2.0).toFixed(2)}" fill="rgba(190,215,255,.08)"/>`);
-      parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${r.toFixed(2)}" fill="rgba(224,235,255,${op.toFixed(2)})"/>`);
+      if(sp.x<-6||sp.x>v.width+6||sp.y<-6||sp.y>v.height+6)continue;
+      visible++;const vis=starVisual(st.mag,preview);
+      if(vis.halo)parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${(vis.r*2.15).toFixed(2)}" fill="rgba(190,215,255,${preview?.06:.10})"/>`);
+      parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${vis.r.toFixed(2)}" fill="rgba(232,240,255,${vis.opacity.toFixed(2)})"/>`);
     }
     return{html:`<g class="frStars" aria-hidden="true">${parts.join('')}</g>`,count:visible,limit};
   }
@@ -108,8 +111,10 @@
       const sp=projectScreen(o.raDeg,o.decDeg,v);if(!sp||sp.x<-20||sp.x>v.width+20||sp.y<-20||sp.y>v.height+20)continue;
       const marker=dsoMarkerHtml(o,sp,v,preview);symbols.push(marker.html);visible++;
       if(preview||labelCount>=profile.labelLimit)continue;
-      const targetSep=Math.hypot((sp.x-v.cx),(sp.y-v.cy));const isTarget=Math.abs(o.raDeg-layout.targetRaDeg)<1e-5&&Math.abs(o.decDeg-layout.targetDecDeg)<1e-5;
+      const isTarget=Math.abs(o.raDeg-layout.targetRaDeg)<1e-5&&Math.abs(o.decDeg-layout.targetDecDeg)<1e-5;
       if(isTarget)continue;
+      const labelAllowed=!!(o.m||o.custom||Number(o.detailTier||9)<=Number(profile.labelTier||0)||Number(o.majorAxisArcmin)>=Number(profile.largeArcmin||9999));
+      if(!labelAllowed)continue;
       const txt=o.label;if(!txt)continue;const x=sp.x+Math.min(24,marker.radius+6),y=sp.y-5,w=Math.min(150,txt.length*7.0+8),h=15,box={x1:x-2,y1:y-12,x2:x+w,y2:y+4};
       if(box.x2>v.width-8||box.y1<8||box.y2>v.height-8||occupied.some(b=>rectsOverlap(box,b,3)))continue;
       occupied.push(box);labelCount++;labels.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="#c9d5e9" font-size="11" font-weight="700" paint-order="stroke" stroke="#07101c" stroke-width="3.5" stroke-linejoin="round" pointer-events="none">${esc(txt)}</text>`);

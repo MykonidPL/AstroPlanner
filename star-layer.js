@@ -97,11 +97,16 @@
   }
   function getStatus(){return{status,count,error:errorText,source:'HYG v4.1',url:STAR_URL};}
   function magnitudeLimit(radiusDeg){
+    // LOD based on the real angular radius of the visible map, not UI zoom %.
+    // Wide fields deliberately keep only the stars that define the constellation/field pattern.
     const r=Number(radiusDeg)||3;
-    if(r>12)return 6.5;
-    if(r>7)return 7.5;
-    if(r>3.5)return 8.5;
-    if(r>1.8)return 9.5;
+    if(r>15)return 5.8;
+    if(r>10)return 6.3;
+    if(r>7)return 6.8;
+    if(r>5)return 7.3;
+    if(r>3)return 8.0;
+    if(r>1.5)return 9.0;
+    if(r>.7)return 10.0;
     return 11.0;
   }
 
