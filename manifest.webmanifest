@@ -1,7 +1,7 @@
 {
   "name": "AstroPlanner",
   "short_name": "AstroPlanner",
-  "description": "AstroPlanner v0.11.3.2 — projekty, planowanie i historia sesji astrofotograficznych.",
+  "description": "AstroPlanner v0.11.3.3 — projekty, planowanie i historia sesji astrofotograficznych.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

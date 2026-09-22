@@ -92,7 +92,8 @@
     const raStart=Math.floor((v.viewRaDeg-raHalf)/raStep)*raStep,raEnd=Math.ceil((v.viewRaDeg+raHalf)/raStep)*raStep;
     const decStart=Math.floor(decMin/decStep)*decStep,decEnd=Math.ceil(decMax/decStep)*decStep;
     const lines=[],labels=[];
-    const majorStroke=`rgba(140,165,205,${preview?.16:.20})`,minorStroke=`rgba(140,165,205,${preview?.08:.11})`;
+    const majorStroke=`rgba(150,180,225,${preview?.22:.36})`,minorStroke=`rgba(140,165,205,${preview?.12:.18})`;
+    const majorWidth=preview?1.0:1.35,minorWidth=preview?.75:.95;
 
     for(let ra=raStart;ra<=raEnd+1e-9;ra+=raStep){
       const pts=[];const segments=Math.max(16,Math.min(56,Math.round((decMax-decMin)/Math.max(decStep,.1))*8));
@@ -100,10 +101,10 @@
         const dec=decMin+(decMax-decMin)*(i/segments),sp=projectScreen(E.normRa(ra),dec,v);
         pts.push(sp&&sp.x>-50&&sp.x<v.width+50&&sp.y>-50&&sp.y<v.height+50?sp:null);
       }
-      const d=buildPath(pts);if(d)lines.push(`<path d="${d}" fill="none" stroke="${Math.abs(normDeltaDeg(ra-v.viewRaDeg))<raStep*.55?majorStroke:minorStroke}" stroke-width="1"/>`);
+      const isMajor=Math.abs(normDeltaDeg(ra-v.viewRaDeg))<raStep*.55;const d=buildPath(pts);if(d)lines.push(`<path d="${d}" fill="none" stroke="${isMajor?majorStroke:minorStroke}" stroke-width="${isMajor?majorWidth:minorWidth}" vector-effect="non-scaling-stroke"/>`);
       if(!preview){
         const labelPoint=projectScreen(E.normRa(ra),clamp(v.viewDecDeg,decMin,decMax),v);
-        if(labelPoint&&labelPoint.x>28&&labelPoint.x<v.width-28)labels.push(`<text x="${labelPoint.x.toFixed(1)}" y="18" text-anchor="middle" fill="#93a9d0" font-size="10" font-weight="700">${esc(formatRaLabel(ra,raStep))}</text>`);
+        if(labelPoint&&labelPoint.x>28&&labelPoint.x<v.width-28)labels.push(`<text x="${labelPoint.x.toFixed(1)}" y="20" text-anchor="middle" fill="#c8d8f4" font-size="12" font-weight="800" paint-order="stroke" stroke="#07101c" stroke-width="4" stroke-linejoin="round">${esc(formatRaLabel(ra,raStep))}</text>`);
       }
     }
     for(let dec=decStart;dec<=decEnd+1e-9;dec+=decStep){
@@ -113,10 +114,10 @@
         const ra=E.normRa(v.viewRaDeg-span+(2*span)*(i/segments)),sp=projectScreen(ra,dec,v);
         pts.push(sp&&sp.x>-50&&sp.x<v.width+50&&sp.y>-50&&sp.y<v.height+50?sp:null);
       }
-      const d=buildPath(pts);if(d)lines.push(`<path d="${d}" fill="none" stroke="${Math.abs(dec-v.viewDecDeg)<decStep*.55?majorStroke:minorStroke}" stroke-width="1"/>`);
+      const isMajor=Math.abs(dec-v.viewDecDeg)<decStep*.55;const d=buildPath(pts);if(d)lines.push(`<path d="${d}" fill="none" stroke="${isMajor?majorStroke:minorStroke}" stroke-width="${isMajor?majorWidth:minorWidth}" vector-effect="non-scaling-stroke"/>`);
       if(!preview){
         const labelPoint=projectScreen(v.viewRaDeg,dec,v);
-        if(labelPoint&&labelPoint.y>18&&labelPoint.y<v.height-12)labels.push(`<text x="10" y="${(labelPoint.y-2).toFixed(1)}" text-anchor="start" fill="#93a9d0" font-size="10" font-weight="700">${esc(formatDecLabel(dec,decStep))}</text>`);
+        if(labelPoint&&labelPoint.y>18&&labelPoint.y<v.height-12)labels.push(`<text x="12" y="${(labelPoint.y-2).toFixed(1)}" text-anchor="start" fill="#c8d8f4" font-size="12" font-weight="800" paint-order="stroke" stroke="#07101c" stroke-width="4" stroke-linejoin="round">${esc(formatDecLabel(dec,decStep))}</text>`);
       }
     }
     return{html:`<g class="frGrid" aria-hidden="true">${lines.join('')}${labels.join('')}</g>`,raStep,decStep};
