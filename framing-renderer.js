@@ -9,11 +9,25 @@
     const cc=E.projectToTangent(layout.centerRaDeg,layout.centerDecDeg,layout.targetRaDeg,layout.targetDecDeg);if(cc)out.push(cc);
     return out;
   }
-  function viewport(layout,width=640,height=360,padding=30){
+  function frameLocalPoints(layout){
+    if(!layout)return[];
+    const out=[{x:0,y:0}];
+    for(const p of layout.panels)for(const c of p.corners||[]){const q=E.projectToTangent(c.raDeg,c.decDeg,layout.centerRaDeg,layout.centerDecDeg);if(q)out.push(q);}
+    return out;
+  }
+  function stableScale(layout,width=640,height=360,padding=30,coverage=.56){
+    const pts=frameLocalPoints(layout);let maxX=.08,maxY=.06;
+    for(const p of pts){maxX=Math.max(maxX,Math.abs(p.x));maxY=Math.max(maxY,Math.abs(p.y));}
+    const usableW=Math.max(40,width-padding*2),usableH=Math.max(40,height-padding*2),cov=Math.min(.82,Math.max(.28,Number(coverage)||.56));
+    return Math.max(.0001,Math.min((usableW*cov)/(maxX*2),(usableH*cov)/(maxY*2)));
+  }
+  function viewport(layout,width=640,height=360,padding=30,fixedScale=null){
     const pts=localPoints(layout);let maxX=.5,maxY=.35;
     for(const p of pts){maxX=Math.max(maxX,Math.abs(p.x));maxY=Math.max(maxY,Math.abs(p.y));}
     maxX*=1.22;maxY*=1.22;
-    const usableW=Math.max(40,width-padding*2),usableH=Math.max(40,height-padding*2),scale=Math.max(.0001,Math.min(usableW/(maxX*2),usableH/(maxY*2)));
+    const usableW=Math.max(40,width-padding*2),usableH=Math.max(40,height-padding*2);
+    const autoScale=Math.max(.0001,Math.min(usableW/(maxX*2),usableH/(maxY*2)));
+    const scale=Number(fixedScale)>0?Number(fixedScale):autoScale;
     return{width,height,padding,scale,maxX,maxY,cx:width/2,cy:height/2};
   }
   function skyToScreen(q,v){return{x:v.cx-q.x*v.scale,y:v.cy-q.y*v.scale};}
@@ -23,7 +37,7 @@
   }
   function render(layout,opts={}){
     if(!layout)return'';
-    const width=Number(opts.width)||640,height=Number(opts.height)||360,v=viewport(layout,width,height,Number(opts.padding)||28),preview=!!opts.preview;
+    const width=Number(opts.width)||640,height=Number(opts.height)||360,v=viewport(layout,width,height,Number(opts.padding)||28,opts.fixedScale),preview=!!opts.preview;
     const axisAlpha=preview?.16:.22,minorAlpha=preview?.08:.11;
     const grid=[];
     for(const f of [-.75,-.5,-.25,.25,.5,.75]){
@@ -41,5 +55,5 @@
     const orient=!preview?`<g font-size="12" fill="#8ea3c8" font-weight="700"><text x="${width-28}" y="25" text-anchor="end">N ↑</text><text x="${width-28}" y="42" text-anchor="end">E ←</text></g>`:'';
     return`<svg class="framingSvg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Podgląd kadru" data-ppd="${v.scale}">${grid.join('')}${panels}<g class="frTarget"><circle cx="${tgt.x}" cy="${tgt.y}" r="${preview?5:7}" fill="none" stroke="#68d391" stroke-width="2"/><line x1="${tgt.x-10}" y1="${tgt.y}" x2="${tgt.x+10}" y2="${tgt.y}" stroke="#68d391"/><line x1="${tgt.x}" y1="${tgt.y-10}" x2="${tgt.x}" y2="${tgt.y+10}" stroke="#68d391"/></g><g class="frCenter"><circle cx="${ctr.x.toFixed(1)}" cy="${ctr.y.toFixed(1)}" r="${preview?3:4}" fill="#f6c453"/></g>${orient}</svg>`;
   }
-  global.AstroFramingRenderer={render,viewport};
+  global.AstroFramingRenderer={render,viewport,stableScale};
 })(window);
