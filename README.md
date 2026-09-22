@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.11.3.3 — Public Beta**
+**v0.11.4 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -15,7 +15,7 @@ https://mykonidpl.github.io/AstroPlanner/
 ## Główne obszary
 
 - **Projekty** — aktywne, planowane i zakończone cele wraz z postępem integracji.
-- **Planner** — wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS.
+- **Planner** — mapa nieba z gwiazdami, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
 - **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
 
@@ -32,6 +32,20 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.11.4
+
+- przeniesiono pełną **Mapę nieba** do głównego przepływu Plannera; mapa pojawia się bezpośrednio po wybraniu obiektu, a nie dopiero wewnątrz projektu,
+- dla dowolnego obiektu bez projektu mapa działa od razu jako atlas gwiazd z prawdziwą siatką RA/Dec, panowaniem i zoomem; FOV nie jest zgadywany, gdy nie wybrano setupu,
+- dodano w mapie Plannera pole **Setup kadru**, zsynchronizowane z planowanym setupem nowego projektu; po wybraniu profilu pojawia się rzeczywisty FOV wynikający z teleskopu/korektora/kamery,
+- Planner korzysta z tego samego silnika projekcji, warstwy gwiazd, siatki RA/Dec i geometrii FOV co dotychczasowy edytor kadru; nie powstał osobny silnik mapy,
+- zachowano tryby **Mapa / Kadr**, live pan, pinch zoom, obrót dwoma palcami, suwak rotacji i przyciski ±90°; dla mozaiki dostępne są również wiersze, kolumny i overlap,
+- przy otwarciu istniejącego projektu Planner ładuje jego zapisany kadr do kopii roboczej; samo eksplorowanie mapy niczego nie zapisuje, a zmiany FOV trafiają do projektu dopiero przez **Zapisz kadr w projekcie**,
+- podczas planowania nowego projektu roboczy kadr jest przejmowany przy tworzeniu projektu, dzięki czemu można najpierw dobrać kompozycję, a dopiero potem utworzyć projekt,
+- przycisk na miniaturze kadru w karcie projektu został zmieniony na **Otwórz w Plannerze**, aby pełna praca z mapą odbywała się w jednym miejscu,
+- wybranie innego obiektu z katalogu podczas oglądania projektu odłącza kontekst projektu i przechodzi do niezależnego planowania nowego celu, zamiast mieszać nowy target ze statystykami starego projektu,
+- brak nowych kluczy danych użytkownika i brak destrukcyjnej migracji; projekty oraz sesje z v0.11.3.3 pozostają kompatybilne,
+- zaktualizowano numer aplikacji i eksportu JSON, manifest, cache PWA do `astroplanner-v0114`, README oraz instrukcję instalacji.
 
 ### v0.11.3.3
 
