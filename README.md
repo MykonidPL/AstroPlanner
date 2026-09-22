@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.11.5 — Public Beta**
+**v0.11.5.2 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,23 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.11.5.2
+
+- rozdzielono tryby **Mapa / Kadr** na poziomie całej interakcji, a nie tylko dragowania jednym palcem,
+- w trybie **Mapa** można przesuwać atlas i wykonywać pinch zoom; FOV, jego środek i rotacja pozostają zablokowane,
+- w trybie **Kadr** można przesuwać FOV oraz obracać go gestem dwóch palców; środek mapy i zoom pozostają zablokowane,
+- dwupalcowy gest nie łączy już zoomu mapy z rotacją kadru: jego działanie zależy wyłącznie od aktualnego trybu,
+- kontrolki niepasujące do aktywnego trybu są wyłączane w UI, m.in. zoom i centrowanie widoku w trybie Kadr oraz rotacja/centrowanie FOV w trybie Mapa,
+- dodano twarde guardy w funkcjach sterujących, aby zablokowanych operacji nie dało się uruchomić również poza gestami,
+- brak zmian w modelu danych projektów i sesji; cache PWA: `astroplanner-v01152`.
+
+### v0.11.5.1
+
+- naprawiono pipeline geometrii DSO, aby rozmiary kątowe mogły być odczytywane z większej liczby wariantów pól katalogowych,
+- dodano bezpieczne fallbacki rozmiaru dla wybranych popularnych obiektów, w tym M31, dzięki czemu nie są przedstawiane wyłącznie jako punkt, gdy źródłowy eksport nie dostarcza geometrii w oczekiwanym polu,
+- fallback jest używany tylko przy braku geometrii katalogowej; dane katalogowe pozostają źródłem preferowanym,
+- brak zmian w danych użytkownika; cache PWA: `astroplanner-v01151`.
 
 ### v0.11.5
 
