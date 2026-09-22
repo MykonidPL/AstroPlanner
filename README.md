@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.11.4 — Public Beta**
+**v0.11.5 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,18 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.11.5
+
+- dodano **warstwę obiektów DSO** do wspólnego silnika mapy Plannera i podglądów kadru; mapa korzysta z tych samych rekordów katalogowych co wyszukiwarka zamiast utrzymywać drugi katalog,
+- obiekty są rysowane według rzeczywistych RA/Dec; przy szerokim polu działa adaptacyjne ograniczanie liczby markerów i etykiet, aby mapa mobilna pozostała czytelna i płynna,
+- galaktyki, gromady, mgławice planetarne, mgławice/SNR i grupy galaktyk mają rozróżnialne techniczne symbole; etykiety są ograniczane dynamicznie i unikają prostych kolizji,
+- jeżeli źródłowy rekord zawiera wiarygodny rozmiar katalogowy, AstroPlanner rysuje footprint z osiami; dla OpenNGC obsługiwane są osie główna/poboczna oraz position angle. Brak rozmiaru skutkuje symbolem stałej wielkości — aplikacja nie wymyśla geometrii,
+- mgławice nadal **nie otrzymują sztucznych konturów**; rzeczywiste kontury wektorowe pozostają osobnym etapem mapy,
+- wyszukiwarka/atlas łączą teraz polskie nazwy i aliasy wbudowanego Messiera z dokładniejszymi współrzędnymi i geometrią katalogu rozszerzonego, gdy istnieje jednoznaczne dopasowanie katalogowe; istniejące projekty nie są automatycznie modyfikowane,
+- dodano osobny moduł `dso-layer.js` z przestrzennym indeksem 5° oraz dynamicznym budżetem obiektów, zamiast skanowania całego katalogu przy każdej klatce przesuwania mapy,
+- uzupełniono `THIRD_PARTY-NOTICES.md` o źródła i granice licencyjne danych DSO,
+- brak nowych kluczy danych użytkownika i brak migracji projektów/sesji; zaktualizowano wersję aplikacji, manifest, cache PWA do `astroplanner-v0115`, README i instrukcję instalacji.
 
 ### v0.11.4
 

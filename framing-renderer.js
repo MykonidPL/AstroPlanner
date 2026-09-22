@@ -58,6 +58,65 @@
     return{html:`<g class="frStars" aria-hidden="true">${parts.join('')}</g>`,count:visible,limit};
   }
 
+  function dsoStyle(kind){
+    const m={
+      'galaxy':{stroke:'#c9a8ff',fill:'rgba(201,168,255,.055)'},
+      'galaxy-group':{stroke:'#b99be8',fill:'rgba(185,155,232,.035)'},
+      'galaxy-cluster':{stroke:'#b99be8',fill:'rgba(185,155,232,.025)'},
+      'open-cluster':{stroke:'#8fd8ff',fill:'rgba(143,216,255,.025)'},
+      'globular-cluster':{stroke:'#ffd18a',fill:'rgba(255,209,138,.035)'},
+      'planetary-nebula':{stroke:'#81e3c2',fill:'rgba(129,227,194,.035)'},
+      'nebula':{stroke:'#eaa8c7',fill:'rgba(234,168,199,.025)'},
+      'snr':{stroke:'#f0a7a7',fill:'rgba(240,167,167,.018)'},
+      'double-star':{stroke:'#b9c8e2',fill:'none'},
+      'other':{stroke:'#aebbd1',fill:'rgba(174,187,209,.02)'}
+    };return m[kind]||m.other;
+  }
+  function localAxisEndpoint(o,angleDeg,halfDeg,v){
+    const a=Number(angleDeg||0)*D2R,x=Math.sin(a)*halfDeg,y=Math.cos(a)*halfDeg,sky=E.tangentToSky(x,y,o.raDeg,o.decDeg);return sky?projectScreen(sky.raDeg,sky.decDeg,v):null;
+  }
+  function dsoFootprint(o,center,v){
+    if(!(Number(o.majorAxisArcmin)>0))return null;
+    const halfMaj=Number(o.majorAxisArcmin)/120,halfMin=Number(o.minorAxisArcmin||o.majorAxisArcmin)/120,pa=Number.isFinite(Number(o.positionAngleDeg))?Number(o.positionAngleDeg):0;
+    const a=localAxisEndpoint(o,pa,halfMaj,v),b=localAxisEndpoint(o,pa+90,halfMin,v);if(!a||!b)return null;
+    const rx=Math.hypot(a.x-center.x,a.y-center.y),ry=Math.hypot(b.x-center.x,b.y-center.y),angle=Math.atan2(a.y-center.y,a.x-center.x)*180/Math.PI;
+    if(!(rx>0&&ry>0))return null;return{rx,ry,angle};
+  }
+  function dsoMarkerHtml(o,sp,v,preview){
+    const st=dsoStyle(o.kind),fp=dsoFootprint(o,sp,v),sw=preview?1:1.35,ve='vector-effect="non-scaling-stroke" pointer-events="none"',parts=[];
+    if(fp&&Math.max(fp.rx,fp.ry)>=3){
+      const rx=Math.min(fp.rx,360),ry=Math.min(fp.ry,360),dash=(o.kind==='nebula'||o.kind==='snr'||o.kind==='open-cluster')?' stroke-dasharray="5 4"':'';
+      parts.push(`<ellipse cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${fp.angle.toFixed(2)} ${sp.x.toFixed(1)} ${sp.y.toFixed(1)})" fill="${st.fill}" stroke="${st.stroke}" stroke-width="${sw}"${dash} ${ve}/>`);
+      if(o.kind==='globular-cluster')parts.push(`<line x1="${(sp.x-4).toFixed(1)}" y1="${sp.y.toFixed(1)}" x2="${(sp.x+4).toFixed(1)}" y2="${sp.y.toFixed(1)}" stroke="${st.stroke}" stroke-width="1" ${ve}/><line x1="${sp.x.toFixed(1)}" y1="${(sp.y-4).toFixed(1)}" x2="${sp.x.toFixed(1)}" y2="${(sp.y+4).toFixed(1)}" stroke="${st.stroke}" stroke-width="1" ${ve}/>`);
+      return{html:parts.join(''),radius:Math.max(rx,ry),footprint:true};
+    }
+    const r=preview?4.0:5.2;
+    if(o.kind==='galaxy')parts.push(`<ellipse cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" rx="${(r*1.35).toFixed(1)}" ry="${(r*.65).toFixed(1)}" fill="${st.fill}" stroke="${st.stroke}" stroke-width="${sw}" ${ve}/>`);
+    else if(o.kind==='open-cluster')parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${r.toFixed(1)}" fill="none" stroke="${st.stroke}" stroke-width="${sw}" stroke-dasharray="3 3" ${ve}/>`);
+    else if(o.kind==='globular-cluster')parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${r.toFixed(1)}" fill="${st.fill}" stroke="${st.stroke}" stroke-width="${sw}" ${ve}/><line x1="${(sp.x-r).toFixed(1)}" y1="${sp.y.toFixed(1)}" x2="${(sp.x+r).toFixed(1)}" y2="${sp.y.toFixed(1)}" stroke="${st.stroke}" stroke-width="1" ${ve}/><line x1="${sp.x.toFixed(1)}" y1="${(sp.y-r).toFixed(1)}" x2="${sp.x.toFixed(1)}" y2="${(sp.y+r).toFixed(1)}" stroke="${st.stroke}" stroke-width="1" ${ve}/>`);
+    else if(o.kind==='planetary-nebula')parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${(r*.72).toFixed(1)}" fill="${st.fill}" stroke="${st.stroke}" stroke-width="${sw}" ${ve}/><path d="M ${(sp.x-r-2).toFixed(1)} ${sp.y.toFixed(1)} h 4 M ${(sp.x+r-2).toFixed(1)} ${sp.y.toFixed(1)} h 4 M ${sp.x.toFixed(1)} ${(sp.y-r-2).toFixed(1)} v 4 M ${sp.x.toFixed(1)} ${(sp.y+r-2).toFixed(1)} v 4" stroke="${st.stroke}" stroke-width="1" ${ve}/>`);
+    else if(o.kind==='nebula'||o.kind==='snr')parts.push(`<path d="M ${sp.x.toFixed(1)} ${(sp.y-r).toFixed(1)} L ${(sp.x+r).toFixed(1)} ${sp.y.toFixed(1)} L ${sp.x.toFixed(1)} ${(sp.y+r).toFixed(1)} L ${(sp.x-r).toFixed(1)} ${sp.y.toFixed(1)} Z" fill="${st.fill}" stroke="${st.stroke}" stroke-width="${sw}" stroke-dasharray="3 2" ${ve}/>`);
+    else if(o.kind==='galaxy-group'||o.kind==='galaxy-cluster')parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${r.toFixed(1)}" fill="none" stroke="${st.stroke}" stroke-width="${sw}" stroke-dasharray="2 2" ${ve}/><circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="2" fill="${st.stroke}" pointer-events="none"/>`);
+    else parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="2.7" fill="none" stroke="${st.stroke}" stroke-width="${sw}" ${ve}/>`);
+    return{html:parts.join(''),radius:r,footprint:false};
+  }
+  function rectsOverlap(a,b,pad=2){return!(a.x2+pad<b.x1||a.x1-pad>b.x2||a.y2+pad<b.y1||a.y1-pad>b.y2);}
+  function dsoLayer(layout,v,preview){
+    const D=global.AstroDsoLayer;if(!D||D.getStatus?.().status!=='ready')return{html:'',count:0,labelCount:0};
+    const radius=Math.hypot(v.width/(2*v.scale),v.height/(2*v.scale))*1.10,objects=D.query(v.viewRaDeg,v.viewDecDeg,radius),symbols=[],labels=[],occupied=[],profile=D.profile?D.profile(radius):{labelLimit:16};let visible=0,labelCount=0;
+    for(const o of objects){
+      const sp=projectScreen(o.raDeg,o.decDeg,v);if(!sp||sp.x<-20||sp.x>v.width+20||sp.y<-20||sp.y>v.height+20)continue;
+      const marker=dsoMarkerHtml(o,sp,v,preview);symbols.push(marker.html);visible++;
+      if(preview||labelCount>=profile.labelLimit)continue;
+      const targetSep=Math.hypot((sp.x-v.cx),(sp.y-v.cy));const isTarget=Math.abs(o.raDeg-layout.targetRaDeg)<1e-5&&Math.abs(o.decDeg-layout.targetDecDeg)<1e-5;
+      if(isTarget)continue;
+      const txt=o.label;if(!txt)continue;const x=sp.x+Math.min(24,marker.radius+6),y=sp.y-5,w=Math.min(150,txt.length*7.0+8),h=15,box={x1:x-2,y1:y-12,x2:x+w,y2:y+4};
+      if(box.x2>v.width-8||box.y1<8||box.y2>v.height-8||occupied.some(b=>rectsOverlap(box,b,3)))continue;
+      occupied.push(box);labelCount++;labels.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="#c9d5e9" font-size="11" font-weight="700" paint-order="stroke" stroke="#07101c" stroke-width="3.5" stroke-linejoin="round" pointer-events="none">${esc(txt)}</text>`);
+    }
+    return{html:`<g class="frDso" aria-hidden="true">${symbols.join('')}${labels.join('')}</g>`,count:visible,labelCount};
+  }
+
   function niceGridStep(spanDeg){
     const steps=[0.05,0.1,0.2,0.5,1,2,5,10,15,30,45,60];
     const target=Math.max(0.04,Number(spanDeg)/5.2);
@@ -127,7 +186,7 @@
     if(!layout)return'';
     const width=Number(opts.width)||640,height=Number(opts.height)||360,preview=!!opts.preview;
     const v=viewport(layout,width,height,Number(opts.padding)||28,opts.fixedScale,opts);
-    const grid=gridLayer(v,preview),stars=starLayer(layout,v,preview);
+    const grid=gridLayer(v,preview),stars=starLayer(layout,v,preview),dsos=dsoLayer(layout,v,preview);
     const panels=(layout.panels||[]).map((p,i)=>{
       const path=panelPath(p,v),sp=projectScreen(p.centerRaDeg,p.centerDecDeg,v)||{x:v.cx,y:v.cy};
       const handle=preview?'':`<path class="frFrameHandle" d="${path}" fill="none" stroke="rgba(0,0,0,0.001)" stroke-width="32" pointer-events="stroke" vector-effect="non-scaling-stroke"/>`;
@@ -137,8 +196,8 @@
     const target=tgt?`<g class="frTarget"><circle cx="${tgt.x.toFixed(1)}" cy="${tgt.y.toFixed(1)}" r="${preview?5:7}" fill="none" stroke="#68d391" stroke-width="2"/><line x1="${(tgt.x-10).toFixed(1)}" y1="${tgt.y.toFixed(1)}" x2="${(tgt.x+10).toFixed(1)}" y2="${tgt.y.toFixed(1)}" stroke="#68d391"/><line x1="${tgt.x.toFixed(1)}" y1="${(tgt.y-10).toFixed(1)}" x2="${tgt.x.toFixed(1)}" y2="${(tgt.y+10).toFixed(1)}" stroke="#68d391"/></g>`:'';
     const center=(layout.panels||[]).length&&ctr?`<g class="frCenter">${preview?'':`<circle class="frFrameHandle" cx="${ctr.x.toFixed(1)}" cy="${ctr.y.toFixed(1)}" r="24" fill="rgba(0,0,0,0.001)" pointer-events="all"/>`}<circle cx="${ctr.x.toFixed(1)}" cy="${ctr.y.toFixed(1)}" r="${preview?3:4}" fill="#f6c453" pointer-events="none"/></g>`:'';
     const orient=!preview?`<g class="frOrient" font-size="12" fill="#8ea3c8" font-weight="700"><text x="${width-28}" y="25" text-anchor="end">N ↑</text><text x="${width-28}" y="42" text-anchor="end">E ←</text></g>`:'';
-    return`<svg class="framingSvg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Podgląd kadru" data-ppd="${v.scale}" data-view-ra="${v.viewRaDeg}" data-view-dec="${v.viewDecDeg}" data-star-count="${stars.count}"${stars.limit!=null?` data-star-limit="${stars.limit}"`:''}>`+
-      `<g class="frMapRoot">${stars.html}${grid.html}${panels}${target}${center}</g>${orient}</svg>`;
+    return`<svg class="framingSvg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Podgląd kadru" data-ppd="${v.scale}" data-view-ra="${v.viewRaDeg}" data-view-dec="${v.viewDecDeg}" data-star-count="${stars.count}" data-dso-count="${dsos.count}" data-dso-label-count="${dsos.labelCount}"${stars.limit!=null?` data-star-limit="${stars.limit}"`:''}>`+
+      `<g class="frMapRoot">${stars.html}${grid.html}${dsos.html}${panels}${target}${center}</g>${orient}</svg>`;
   }
   global.AstroFramingRenderer={render,viewport,stableScale};
 })(window);
