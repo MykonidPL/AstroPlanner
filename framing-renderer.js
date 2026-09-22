@@ -35,6 +35,25 @@
     const pts=(panel.corners||[]).map(c=>E.projectToTangent(c.raDeg,c.decDeg,layout.targetRaDeg,layout.targetDecDeg)).filter(Boolean).map(q=>skyToScreen(q,v));
     return pts.length===4?pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' ')+' Z':'';
   }
+
+  function clamp(v,a,b){return Math.min(b,Math.max(a,v));}
+  function starRadius(mag,preview){
+    const base=3.15-.27*(Number(mag)+1),r=clamp(base,.55,3.2);
+    return preview?Math.max(.5,r*.88):r;
+  }
+  function starLayer(layout,v,preview){
+    const S=global.AstroStarLayer;if(!S||S.getStatus?.().status!=='ready')return{html:'',count:0,limit:null};
+    const radius=Math.hypot(v.width/(2*v.scale),v.height/(2*v.scale))*1.08,limit=S.magnitudeLimit?S.magnitudeLimit(radius):10;
+    const stars=S.query(layout.targetRaDeg,layout.targetDecDeg,radius,limit),parts=[];let visible=0;
+    for(const st of stars){
+      const q=E.projectToTangent(st.raDeg,st.decDeg,layout.targetRaDeg,layout.targetDecDeg);if(!q)continue;
+      const sp=skyToScreen(q,v);if(sp.x<-5||sp.x>v.width+5||sp.y<-5||sp.y>v.height+5)continue;
+      visible++;const r=starRadius(st.mag,preview),op=clamp(.48+(limit-Number(st.mag))*.055,.46,.94);
+      if(st.mag<=2.2)parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${(r*2.0).toFixed(2)}" fill="rgba(190,215,255,.08)"/>`);
+      parts.push(`<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${r.toFixed(2)}" fill="rgba(224,235,255,${op.toFixed(2)})"/>`);
+    }
+    return{html:`<g class="frStars" aria-hidden="true">${parts.join('')}</g>`,count:visible,limit};
+  }
   function render(layout,opts={}){
     if(!layout)return'';
     const width=Number(opts.width)||640,height=Number(opts.height)||360,v=viewport(layout,width,height,Number(opts.padding)||28,opts.fixedScale),preview=!!opts.preview;
@@ -47,13 +66,14 @@
     }
     grid.push(`<line x1="${v.cx}" y1="16" x2="${v.cx}" y2="${height-16}" stroke="rgba(140,165,205,${axisAlpha})" stroke-width="1"/>`);
     grid.push(`<line x1="16" y1="${v.cy}" x2="${width-16}" y2="${v.cy}" stroke="rgba(140,165,205,${axisAlpha})" stroke-width="1"/>`);
+    const stars=starLayer(layout,v,preview);
     const panels=layout.panels.map((p,i)=>{
       const path=panelPath(p,layout,v),centerQ=E.projectToTangent(p.centerRaDeg,p.centerDecDeg,layout.targetRaDeg,layout.targetDecDeg),sp=centerQ?skyToScreen(centerQ,v):{x:v.cx,y:v.cy};
       return`<g class="frPanel"><path d="${path}" fill="rgba(106,167,255,${preview?.08:.10})" stroke="${i===0?'#8fc0ff':'#6aa7ff'}" stroke-width="${preview?1.5:2}" vector-effect="non-scaling-stroke"/><circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="${preview?2:3}" fill="#9ec7ff"/><text x="${sp.x.toFixed(1)}" y="${(sp.y-(preview?7:10)).toFixed(1)}" text-anchor="middle" fill="#dce9ff" font-size="${preview?14:16}" font-weight="800">${esc(p.name)}</text></g>`;
     }).join('');
     const tgt={x:v.cx,y:v.cy},centerQ=E.projectToTangent(layout.centerRaDeg,layout.centerDecDeg,layout.targetRaDeg,layout.targetDecDeg)||{x:0,y:0},ctr=skyToScreen(centerQ,v);
     const orient=!preview?`<g font-size="12" fill="#8ea3c8" font-weight="700"><text x="${width-28}" y="25" text-anchor="end">N ↑</text><text x="${width-28}" y="42" text-anchor="end">E ←</text></g>`:'';
-    return`<svg class="framingSvg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Podgląd kadru" data-ppd="${v.scale}">${grid.join('')}${panels}<g class="frTarget"><circle cx="${tgt.x}" cy="${tgt.y}" r="${preview?5:7}" fill="none" stroke="#68d391" stroke-width="2"/><line x1="${tgt.x-10}" y1="${tgt.y}" x2="${tgt.x+10}" y2="${tgt.y}" stroke="#68d391"/><line x1="${tgt.x}" y1="${tgt.y-10}" x2="${tgt.x}" y2="${tgt.y+10}" stroke="#68d391"/></g><g class="frCenter"><circle cx="${ctr.x.toFixed(1)}" cy="${ctr.y.toFixed(1)}" r="${preview?3:4}" fill="#f6c453"/></g>${orient}</svg>`;
+    return`<svg class="framingSvg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Podgląd kadru" data-ppd="${v.scale}" data-star-count="${stars.count}"${stars.limit!=null?` data-star-limit="${stars.limit}"`:''}>${stars.html}${grid.join('')}${panels}<g class="frTarget"><circle cx="${tgt.x}" cy="${tgt.y}" r="${preview?5:7}" fill="none" stroke="#68d391" stroke-width="2"/><line x1="${tgt.x-10}" y1="${tgt.y}" x2="${tgt.x+10}" y2="${tgt.y}" stroke="#68d391"/><line x1="${tgt.x}" y1="${tgt.y-10}" x2="${tgt.x}" y2="${tgt.y+10}" stroke="#68d391"/></g><g class="frCenter"><circle cx="${ctr.x.toFixed(1)}" cy="${ctr.y.toFixed(1)}" r="${preview?3:4}" fill="#f6c453"/></g>${orient}</svg>`;
   }
   global.AstroFramingRenderer={render,viewport,stableScale};
 })(window);

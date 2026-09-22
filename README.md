@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.11.1.2 — Public Beta**
+**v0.11.2 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -32,6 +32,17 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.11.2
+
+- dodano pierwszą właściwą warstwę mapy kadrowania: **realne gwiazdy katalogowe** są rysowane jako techniczne punkty bez fotograficznego tła i bez elementów planetarium,
+- źródłem warstwy jest HYG v4.1; aplikacja korzysta z kompaktowego katalogu binarnego i wyświetla tylko gwiazdy znajdujące się w aktualnym lokalnym polu mapy,
+- jasność punktów i ich rozmiar zależą od magnitudo, a limit jasności jest dobierany automatycznie do skali widoku, aby mapa pozostała czytelna,
+- warstwa gwiazd jest wspólna dla pojedynczego kadru i mozaiki oraz pojawia się także w miniaturowym podglądzie kadru na karcie projektu,
+- katalog gwiazd jest pobierany asynchronicznie i nie blokuje uruchomienia AstroPlannera; po pierwszym udanym pobraniu jest przechowywany w osobnym cache `astroplanner-stars-v01` i może być używany offline,
+- brak sieci lub niedostępność katalogu nie blokuje kadrowania: geometria FOV, przesuwanie, obrót, overlap i zapis RA/Dec działają nadal bez warstwy gwiazd,
+- nie zmieniono modelu projektów ani sesji; nie jest wymagana migracja istniejących danych,
+- dodano `star-layer.js`, zaktualizowano cache aplikacji do `astroplanner-v0112`, numer eksportu JSON, manifest, README i instrukcję instalacji.
 
 ### v0.11.1.2
 
@@ -231,6 +242,10 @@ Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, kore
 
 - poprawiono usuwanie projektów z historią,
 - projekt z zapisanymi sesjami można zachować jako ukończony albo trwale usunąć razem z przypisanymi sesjami.
+
+## Dane astronomiczne i licencje zewnętrzne
+
+Warstwa gwiazd korzysta z **HYG v4.1** (David Nash / Astronexus), udostępnianego na licencji **CC BY-SA 4.0**. AstroPlanner pobiera kompaktową reprezentację katalogu przygotowaną w projekcie `bryancurran/celestial-cartography`; dane gwiazd pozostają objęte właściwą licencją HYG. Szczegóły znajdują się również w `THIRD_PARTY-NOTICES.md`.
 
 ## Copyright
 

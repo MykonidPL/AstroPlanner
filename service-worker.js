@@ -1,4 +1,4 @@
-const CACHE='astroplanner-v01112';
+const CACHE='astroplanner-v0112';
 const CATALOG_CACHE='astroplanner-catalog-v06';
 const CATALOG_COMMIT='ef52c7ea920191d45fe0da4711dd3b1cc9220c18';
 const CATALOG_ASSETS=[
@@ -6,7 +6,7 @@ const CATALOG_ASSETS=[
   `https://raw.githubusercontent.com/acocalypso/celestia_atlas/${CATALOG_COMMIT}/data/stellarium-dso-supplement.json`,
   `https://raw.githubusercontent.com/acocalypso/celestia_atlas/${CATALOG_COMMIT}/data/abell-pn-catalog.json`
 ];
-const ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./zwo-cameras.json','./framing-engine.js','./framing-renderer.js'];
+const ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./zwo-cameras.json','./framing-engine.js','./star-layer.js','./framing-renderer.js'];
 
 async function warmCatalogCache(){
   const cache=await caches.open(CATALOG_CACHE);
@@ -31,7 +31,7 @@ self.addEventListener('install',e=>e.waitUntil(Promise.all([
   warmCatalogCache()
 ]).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(
-  keys.filter(k=>k!==CACHE&&!k.startsWith('astroplanner-catalog-')).map(k=>caches.delete(k))
+  keys.filter(k=>k!==CACHE&&!k.startsWith('astroplanner-catalog-')&&!k.startsWith('astroplanner-stars-')).map(k=>caches.delete(k))
 )).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
