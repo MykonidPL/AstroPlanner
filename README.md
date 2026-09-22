@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.10.6.5 — Public Beta**
+**v0.11.0 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -17,7 +17,7 @@ https://mykonidpl.github.io/AstroPlanner/
 - **Projekty** — aktywne, planowane i zakończone cele wraz z postępem integracji.
 - **Planner** — wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
-- **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego.
+- **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
 
 AstroPlanner działa jako PWA i jest projektowany przede wszystkim do wygodnej obsługi na telefonie oraz pracy terenowej.
 
@@ -32,6 +32,19 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.11.0
+
+- rozbudowano istniejące **Profile setupów** w automatyczne zestawy optyczne: na podstawie teleskopu, korektora/reduktora i kamery AstroPlanner wylicza efektywną ogniskową, światłosiłę, skalę obrazu oraz pole widzenia,
+- profil pokazuje obliczone parametry już podczas tworzenia i edycji; brakujące dane kamery (pixel size lub wymiary sensora) są sygnalizowane bez zgadywania wartości,
+- projekt może mieć opcjonalny **Planowany setup** wskazujący istniejący profil; starsze projekty bez `profileId` działają bez migracji,
+- karta projektu i Planner pokazują parametry planowanego zestawu automatycznie, bez ręcznego przepisywania ogniskowej, piksela ani wymiarów sensora,
+- Planner dostał sekcję **Kadr zestawu** z nazwą setupu, f/, skalą obrazu i FOV,
+- nowa sesja projektu z przypisanym setupem automatycznie dziedziczy teleskop, korektor i kamerę z profilu; ręczna zmiana optyki odłącza sesję od profilu zamiast błędnie zachowywać jego nazwę,
+- zapis sesji przechowuje historyczny snapshot parametrów optycznych (m.in. efektywną ogniskową, f/, skalę i FOV), dzięki czemu późniejsza edycja profilu nie zmienia historii,
+- Dziennik pokazuje zapisane parametry setupu w szczegółach sesji,
+- zachowano pełną zgodność z istniejącymi projektami, sesjami, kamerami, profilami i backupami v0.10.6.x; nie jest wymagana destrukcyjna migracja,
+- zaktualizowano numer aplikacji, eksport JSON, manifest, cache PWA, README oraz instrukcję instalacji.
 
 ### v0.10.6.5
 

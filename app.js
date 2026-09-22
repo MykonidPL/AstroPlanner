@@ -1,2 +1,2 @@
-// AstroPlanner v0.10.6.5
+// AstroPlanner v0.11.0
 // Runtime application code is bundled inline in index.html.
