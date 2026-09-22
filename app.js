@@ -1,2 +1,2 @@
-// AstroPlanner v0.11.5.3
+// AstroPlanner v0.11.5.4
 // Runtime core is bundled inline in index.html; framing geometry/rendering lives in framing-engine.js and framing-renderer.js; the stellar map layer lives in star-layer.js.
