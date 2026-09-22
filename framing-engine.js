@@ -2,7 +2,7 @@
   'use strict';
   const D2R=Math.PI/180,R2D=180/Math.PI;
   const finite=v=>Number.isFinite(Number(v));
-  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+  const clamp=(v,a,b)=>Math.min(b,Math.max(a,Number(v)));
   const normRa=v=>((Number(v)%360)+360)%360;
   const normRot=v=>{let n=((Number(v)%360)+360)%360;return n>=180?n-360:n;};
   function validCoord(ra,dec){return finite(ra)&&finite(dec)&&Number(dec)>=-90&&Number(dec)<=90;}
@@ -69,11 +69,17 @@
     const centerLocal=projectToTangent(c.centerRaDeg,c.centerDecDeg,c.targetRaDeg,c.targetDecDeg)||{x:0,y:0};
     return{...c,rows,cols,total,validPanelCount:c.type==='mosaic'?c.panelCount:1,gridMatches:c.type!=='mosaic'||total===c.panelCount,centerLocal,panels,target:{raDeg:c.targetRaDeg,decDeg:c.targetDecDeg}};
   }
-  function shiftedCenterFromScreenDrag(layout,dxPx,dyPx,pixelsPerDegree){
-    if(!layout||!(pixelsPerDegree>0))return null;
-    const cur=layout.centerLocal||projectToTangent(layout.centerRaDeg,layout.centerDecDeg,layout.targetRaDeg,layout.targetDecDeg)||{x:0,y:0};
+  function shiftSkyFromScreenDrag(raDeg,decDeg,referenceRaDeg,referenceDecDeg,dxPx,dyPx,pixelsPerDegree){
+    if(!(pixelsPerDegree>0)||!validCoord(raDeg,decDeg)||!validCoord(referenceRaDeg,referenceDecDeg))return null;
+    const cur=projectToTangent(raDeg,decDeg,referenceRaDeg,referenceDecDeg)||{x:0,y:0};
     const nextX=cur.x-Number(dxPx)/pixelsPerDegree,nextY=cur.y-Number(dyPx)/pixelsPerDegree;
-    return tangentToSky(nextX,nextY,layout.targetRaDeg,layout.targetDecDeg);
+    return tangentToSky(nextX,nextY,referenceRaDeg,referenceDecDeg);
   }
-  global.AstroFraming={validCoord,projectToTangent,tangentToSky,rotate,planeSizeFromFov,defaultGridForCount,frameCorners,createLayout,shiftedCenterFromScreenDrag,normRa,normRot};
+  function shiftedCenterFromScreenDrag(layout,dxPx,dyPx,pixelsPerDegree,referenceRaDeg,referenceDecDeg){
+    if(!layout)return null;
+    const refRa=finite(referenceRaDeg)?referenceRaDeg:layout.targetRaDeg;
+    const refDec=finite(referenceDecDeg)?referenceDecDeg:layout.targetDecDeg;
+    return shiftSkyFromScreenDrag(layout.centerRaDeg,layout.centerDecDeg,refRa,refDec,dxPx,dyPx,pixelsPerDegree);
+  }
+  global.AstroFraming={validCoord,projectToTangent,tangentToSky,rotate,planeSizeFromFov,defaultGridForCount,frameCorners,createLayout,shiftSkyFromScreenDrag,shiftedCenterFromScreenDrag,normRa,normRot};
 })(window);
