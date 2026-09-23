@@ -113,19 +113,19 @@
       const isTarget=Math.abs(o.raDeg-layout.targetRaDeg)<1e-5&&Math.abs(o.decDeg-layout.targetDecDeg)<1e-5;
       const marker=dsoMarkerHtml(o,sp,v,preview);
       const isProtected=!!(isTarget||o.m||o.custom||marker.footprint||Number(o.majorAxisArcmin)>=Number(profile.largeArcmin||9999));
-      const exclusion=Math.max(marker.radius||3,3)+(isProtected?symbolSpacing*.35:symbolSpacing*.5);
+      const collisionRadius=marker.footprint?Math.min(7,Math.max(marker.radius||3,3)):Math.max(marker.radius||3,3),exclusion=collisionRadius+(isProtected?symbolSpacing*.35:symbolSpacing*.5);
       const symbolBox={x1:sp.x-exclusion,y1:sp.y-exclusion,x2:sp.x+exclusion,y2:sp.y+exclusion};
       if(!isProtected){
         if(visible>=symbolLimit)continue;
-        if(occupiedSymbols.some(b=>rectsOverlap(symbolBox,b,0)))continue;
+        if(occupiedSymbols.some(s=>rectsOverlap(symbolBox,s.box,0)))continue;
       }
-      symbols.push(marker.html);visible++;occupiedSymbols.push(symbolBox);
+      symbols.push(marker.html);visible++;occupiedSymbols.push({id:o.id,box:symbolBox});
       if(preview||labelCount>=labelLimit)continue;
       if(isTarget)continue;
       const labelAllowed=!!(o.m||o.custom||Number(o.detailTier||9)<=Number(profile.labelTier||0)||Number(o.majorAxisArcmin)>=Number(profile.largeArcmin||9999));
       if(!labelAllowed)continue;
       const txt=o.label;if(!txt)continue;const x=sp.x+Math.min(24,marker.radius+6),y=sp.y-5,w=Math.min(150,txt.length*7.0+8),box={x1:x-2,y1:y-12,x2:x+w,y2:y+4};
-      if(box.x2>v.width-8||box.y1<8||box.y2>v.height-8||occupiedLabels.some(b=>rectsOverlap(box,b,3))||occupiedSymbols.some(b=>rectsOverlap(box,b,2)))continue;
+      if(box.x2>v.width-8||box.y1<8||box.y2>v.height-8||occupiedLabels.some(b=>rectsOverlap(box,b,3))||occupiedSymbols.some(s=>s.id!==o.id&&rectsOverlap(box,s.box,2)))continue;
       occupiedLabels.push(box);labelCount++;labels.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="#c9d5e9" font-size="11" font-weight="700" paint-order="stroke" stroke="#07101c" stroke-width="3.5" stroke-linejoin="round" pointer-events="none">${esc(txt)}</text>`);
     }
     return{html:`<g class="frDso" aria-hidden="true">${symbols.join('')}${labels.join('')}</g>`,count:visible,labelCount};
