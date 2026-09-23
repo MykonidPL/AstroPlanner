@@ -106,18 +106,27 @@
   function rectsOverlap(a,b,pad=2){return!(a.x2+pad<b.x1||a.x1-pad>b.x2||a.y2+pad<b.y1||a.y1-pad>b.y2);}
   function dsoLayer(layout,v,preview){
     const D=global.AstroDsoLayer;if(!D||D.getStatus?.().status!=='ready')return{html:'',count:0,labelCount:0};
-    const radius=Math.hypot(v.width/(2*v.scale),v.height/(2*v.scale))*1.10,objects=D.query(v.viewRaDeg,v.viewDecDeg,radius),symbols=[],labels=[],occupied=[],profile=D.profile?D.profile(radius):{labelLimit:16};let visible=0,labelCount=0;
+    const radius=Math.hypot(v.width/(2*v.scale),v.height/(2*v.scale))*1.10,objects=D.query(v.viewRaDeg,v.viewDecDeg,radius),symbols=[],labels=[],occupiedLabels=[],occupiedSymbols=[],profile=D.profile?D.profile(radius,v.width,v.height):{labelLimit:16,screenSymbolLimit:64,screenLabelLimit:16,symbolSpacing:22};let visible=0,labelCount=0;
+    const symbolLimit=Math.max(1,Number(profile.screenSymbolLimit||profile.limit||64)),labelLimit=Math.max(1,Number(profile.screenLabelLimit||profile.labelLimit||16)),symbolSpacing=Math.max(8,Number(profile.symbolSpacing||22));
     for(const o of objects){
       const sp=projectScreen(o.raDeg,o.decDeg,v);if(!sp||sp.x<-20||sp.x>v.width+20||sp.y<-20||sp.y>v.height+20)continue;
-      const marker=dsoMarkerHtml(o,sp,v,preview);symbols.push(marker.html);visible++;
-      if(preview||labelCount>=profile.labelLimit)continue;
       const isTarget=Math.abs(o.raDeg-layout.targetRaDeg)<1e-5&&Math.abs(o.decDeg-layout.targetDecDeg)<1e-5;
+      const marker=dsoMarkerHtml(o,sp,v,preview);
+      const isProtected=!!(isTarget||o.m||o.custom||marker.footprint||Number(o.majorAxisArcmin)>=Number(profile.largeArcmin||9999));
+      const exclusion=Math.max(marker.radius||3,3)+(isProtected?symbolSpacing*.35:symbolSpacing*.5);
+      const symbolBox={x1:sp.x-exclusion,y1:sp.y-exclusion,x2:sp.x+exclusion,y2:sp.y+exclusion};
+      if(!isProtected){
+        if(visible>=symbolLimit)continue;
+        if(occupiedSymbols.some(b=>rectsOverlap(symbolBox,b,0)))continue;
+      }
+      symbols.push(marker.html);visible++;occupiedSymbols.push(symbolBox);
+      if(preview||labelCount>=labelLimit)continue;
       if(isTarget)continue;
       const labelAllowed=!!(o.m||o.custom||Number(o.detailTier||9)<=Number(profile.labelTier||0)||Number(o.majorAxisArcmin)>=Number(profile.largeArcmin||9999));
       if(!labelAllowed)continue;
-      const txt=o.label;if(!txt)continue;const x=sp.x+Math.min(24,marker.radius+6),y=sp.y-5,w=Math.min(150,txt.length*7.0+8),h=15,box={x1:x-2,y1:y-12,x2:x+w,y2:y+4};
-      if(box.x2>v.width-8||box.y1<8||box.y2>v.height-8||occupied.some(b=>rectsOverlap(box,b,3)))continue;
-      occupied.push(box);labelCount++;labels.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="#c9d5e9" font-size="11" font-weight="700" paint-order="stroke" stroke="#07101c" stroke-width="3.5" stroke-linejoin="round" pointer-events="none">${esc(txt)}</text>`);
+      const txt=o.label;if(!txt)continue;const x=sp.x+Math.min(24,marker.radius+6),y=sp.y-5,w=Math.min(150,txt.length*7.0+8),box={x1:x-2,y1:y-12,x2:x+w,y2:y+4};
+      if(box.x2>v.width-8||box.y1<8||box.y2>v.height-8||occupiedLabels.some(b=>rectsOverlap(box,b,3))||occupiedSymbols.some(b=>rectsOverlap(box,b,2)))continue;
+      occupiedLabels.push(box);labelCount++;labels.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="#c9d5e9" font-size="11" font-weight="700" paint-order="stroke" stroke="#07101c" stroke-width="3.5" stroke-linejoin="round" pointer-events="none">${esc(txt)}</text>`);
     }
     return{html:`<g class="frDso" aria-hidden="true">${symbols.join('')}${labels.join('')}</g>`,count:visible,labelCount};
   }

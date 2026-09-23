@@ -74,19 +74,32 @@
     for(let i=0;i<RA_BINS;i++){const mid=(i+.5)*BIN_RA;if(a<=b?(mid>=a&&mid<=b):(mid>=a||mid<=b))out.push(i);}
     return out;
   }
-  function profile(radiusDeg){
+  function profile(radiusDeg,viewportWidth,viewportHeight){
     // DSO level-of-detail is based on the real angular radius of the map.
     // symbolTier and labelTier are intentionally different: seeing a marker does not
     // automatically mean its label deserves screen space. 0=Messier/custom, 1=NGC/IC,
     // 2=Sh2/vdB/RCW/Abell/other, 3=LDN/LBN/Barnard and similarly dense catalogues.
     const r=Number(radiusDeg)||4;
-    if(r>15)return{limit:45,magLimit:8.5,symbolTier:0,labelTier:0,labelLimit:5,largeArcmin:45,brightMag:6.5,unknownMinArcmin:40};
-    if(r>9)return{limit:70,magLimit:10,symbolTier:1,labelTier:0,labelLimit:6,largeArcmin:35,brightMag:7.5,unknownMinArcmin:25};
-    if(r>6)return{limit:100,magLimit:11.5,symbolTier:1,labelTier:1,labelLimit:8,largeArcmin:25,brightMag:8.5,unknownMinArcmin:16};
-    if(r>4)return{limit:150,magLimit:13,symbolTier:2,labelTier:1,labelLimit:11,largeArcmin:18,brightMag:9.5,unknownMinArcmin:10};
-    if(r>2.2)return{limit:230,magLimit:15.5,symbolTier:2,labelTier:2,labelLimit:15,largeArcmin:10,brightMag:11,unknownMinArcmin:5};
-    if(r>1.1)return{limit:340,magLimit:18,symbolTier:3,labelTier:2,labelLimit:20,largeArcmin:5,brightMag:13,unknownMinArcmin:2};
-    return{limit:520,magLimit:20,symbolTier:3,labelTier:3,labelLimit:28,largeArcmin:0,brightMag:20,unknownMinArcmin:0};
+    let base;
+    if(r>15)base={limit:45,magLimit:8.5,symbolTier:0,labelTier:0,labelLimit:5,largeArcmin:45,brightMag:6.5,unknownMinArcmin:40};
+    else if(r>9)base={limit:70,magLimit:10,symbolTier:1,labelTier:0,labelLimit:6,largeArcmin:35,brightMag:7.5,unknownMinArcmin:25};
+    else if(r>6)base={limit:100,magLimit:11.5,symbolTier:1,labelTier:0,labelLimit:8,largeArcmin:25,brightMag:8.5,unknownMinArcmin:16};
+    else if(r>4)base={limit:150,magLimit:13,symbolTier:2,labelTier:1,labelLimit:11,largeArcmin:18,brightMag:9.5,unknownMinArcmin:10};
+    else if(r>2.2)base={limit:230,magLimit:15.5,symbolTier:2,labelTier:2,labelLimit:15,largeArcmin:10,brightMag:11,unknownMinArcmin:5};
+    else if(r>1.1)base={limit:340,magLimit:18,symbolTier:3,labelTier:2,labelLimit:20,largeArcmin:5,brightMag:13,unknownMinArcmin:2};
+    else base={limit:520,magLimit:20,symbolTier:3,labelTier:3,labelLimit:28,largeArcmin:0,brightMag:20,unknownMinArcmin:0};
+    const vw=Number(viewportWidth)||0,vh=Number(viewportHeight)||0;
+    if(!(vw>0&&vh>0))return base;
+    const areaFactor=clamp((vw*vh)/(330*390),.75,2.4);
+    let symbolBase=24,labelBase=6,spacing=24;
+    if(r>15){symbolBase=12;labelBase=3;spacing=30;}
+    else if(r>9){symbolBase=18;labelBase=4;spacing=28;}
+    else if(r>6){symbolBase=24;labelBase=5;spacing=26;}
+    else if(r>4){symbolBase=34;labelBase=7;spacing=24;}
+    else if(r>2.2){symbolBase=52;labelBase=10;spacing=20;}
+    else if(r>1.1){symbolBase=74;labelBase=14;spacing=16;}
+    else{symbolBase=110;labelBase=20;spacing=12;}
+    return{...base,screenSymbolLimit:Math.max(8,Math.min(base.limit,Math.round(symbolBase*areaFactor))),screenLabelLimit:Math.max(2,Math.min(base.labelLimit,Math.round(labelBase*Math.pow(areaFactor,.72)))),symbolSpacing:spacing};
   }
   function query(centerRa,centerDec,radiusDeg){
     if(!records.length||!finite(centerRa)||!finite(centerDec)||!(Number(radiusDeg)>0))return[];
