@@ -166,7 +166,7 @@
     const decStart=Math.floor(decMin/decStep)*decStep,decEnd=Math.ceil(decMax/decStep)*decStep;
     const lines=[],labels=[];
     const majorStroke=`rgba(150,180,225,${preview?.22:.36})`,minorStroke=`rgba(140,165,205,${preview?.12:.18})`;
-    const majorWidth=preview?1.0:1.35,minorWidth=preview?.75:.95;
+    const minorWidth=preview?.75:.95,majorWidth=minorWidth;
 
     for(let ra=raStart;ra<=raEnd+1e-9;ra+=raStep){
       const pts=[];const segments=Math.max(16,Math.min(56,Math.round((decMax-decMin)/Math.max(decStep,.1))*8));

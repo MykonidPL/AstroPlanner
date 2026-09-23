@@ -1,6 +1,31 @@
-# Third-party notices — AstroPlanner v0.11.5
+# Third-party notices — AstroPlanner v0.12
 
 AstroPlanner application code is licensed separately under the repository's `LICENSE`. The astronomical catalog data listed below remains subject to its own upstream licence and attribution terms.
+
+## Aladin Lite
+
+- Component: Aladin Lite v3 (loaded at runtime from the official CDS service)
+- Developer / maintainer: Centre de Données astronomiques de Strasbourg (CDS), Université de Strasbourg / CNRS
+- Project: https://github.com/cds-astro/aladin-lite
+- Runtime service used by AstroPlanner: `https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js`
+- License declared by the current upstream package: GNU Lesser General Public License v3.0 or later (**LGPL-3.0-or-later**)
+- License text: https://github.com/cds-astro/aladin-lite/blob/master/LICENSE
+- Documentation / terms of use: https://aladin.cds.unistra.fr/AladinLite/doc/
+
+AstroPlanner uses Aladin Lite only as the browser-side HiPS raster renderer. AstroPlanner keeps its own map controls, coordinate grid, target/FOV/mosaic geometry and application data model. Aladin Lite is not bundled into this repository; it is loaded dynamically from the CDS service.
+
+## DSS2 Color HiPS
+
+- HiPS identifier used by AstroPlanner: `CDS/P/DSS2/color` (Aladin alias `P/DSS2/color`)
+- Survey title: DSS colored / DSS2 Color
+- HiPS producer: CDS (Strasbourg)
+- Original survey imagery: Digitized Sky Survey, STScI/NASA; photographic material from the Oschin Schmidt Telescope at Palomar and the UK Schmidt Telescope
+- HiPS copyright metadata: CNRS / Université de Strasbourg
+- HiPS license metadata: Open Database License 1.0 (**ODbL-1.0**)
+- Metadata / attribution record: https://alasky.cds.unistra.fr/MocServer/query?ID=CDS%2FP%2FDSS2%2Fcolor&fmt=html&get=record
+- STScI DSS copyright information: https://archive.stsci.edu/dss/copyright.html
+
+The CDS metadata states that the color HiPS is composed from DSS2 red and blue surveys generated from original scanned plates obtained from STScI, with the green channel derived from the other components. It also carries the Digitized Sky Survey acknowledgement identifying STScI and the originating Palomar/UK Schmidt photographic surveys. AstroPlanner does not redistribute DSS2 tiles; the application requests them from the external HiPS service at runtime.
 
 ## HYG star database v4.1
 

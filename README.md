@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.11.5.6 — Public Beta**
+**v0.12 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -15,7 +15,7 @@ https://mykonidpl.github.io/AstroPlanner/
 ## Główne obszary
 
 - **Projekty** — aktywne, planowane i zakończone cele wraz z postępem integracji.
-- **Planner** — mapa nieba z gwiazdami, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS.
+- **Planner** — pełna mapa nieba **DSS2 Color** z katalogowymi nazwami DSO, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS. Raster jest pasywnym tłem; sterowanie mapą, FOV, rotacją i mozaiką pozostaje po stronie AstroPlannera.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
 - **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
 
@@ -32,6 +32,17 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.12
+
+- dodano pełnoekranową warstwę rastrową **DSS2 Color** (`P/DSS2/color`) do głównej mapy Plannera; pokrycie jest pełnosferyczne, więc mapa nie ma już granicy deklinacji ani przełączania między surveyami,
+- raster jest renderowany przez **Aladin Lite** jako pasywna warstwa pod istniejącym SVG AstroPlannera; nie przejmuje gestów ani logiki mapy — pan/zoom, RA/Dec, FOV, rotacja, mozaika, target i zapis kadru zachowują mechanikę v0.11.5.6,
+- przy aktywnym rasterze ukrywane są duplikujące obraz syntetyczne gwiazdy oraz symbole/footprinty DSO; pozostają nazwy obiektów, własna siatka RA/Dec, FOV/mozaika, target i orientacja,
+- zachowano techniczne warstwy HYG i DSO jako **fallback**: jeżeli Aladin Lite lub DSS2 nie są dostępne online, AstroPlanner nadal może wyświetlić mapę techniczną z v0.11.5.6,
+- ujednolicono grubość centralnych linii siatki RA/Dec z pozostałymi liniami; linie główne pozostają nieco jaśniejsze, ale nie są grubsze,
+- dodano osobny moduł `raster-layer.js`; zaktualizowano PWA cache do `astroplanner-v012`, manifest, informacje o wersji i eksport backupu,
+- uzupełniono `THIRD_PARTY-NOTICES.md` oraz README o Aladin Lite i DSS2 Color,
+- **brak migracji danych użytkownika**: projekty, planowane projekty, sesje, sprzęt, profile setupów, kadry, mozaiki, materiał, lokalizacje, darki i backupy z v0.11.5.6 pozostają kompatybilne.
 
 ### v0.11.5.6
 
@@ -363,7 +374,11 @@ Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, kore
 
 ## Dane astronomiczne i licencje zewnętrzne
 
-Warstwa gwiazd korzysta z **HYG v4.1** (David Nash / Astronexus), udostępnianego na licencji **CC BY-SA 4.0**. AstroPlanner pobiera kompaktową reprezentację katalogu przygotowaną w projekcie `bryancurran/celestial-cartography`; dane gwiazd pozostają objęte właściwą licencją HYG. Szczegóły znajdują się również w `THIRD_PARTY-NOTICES.md`.
+Główna mapa v0.12 korzysta z **DSS2 Color** (`P/DSS2/color`) przygotowanego jako HiPS przez CDS na podstawie danych Digitized Sky Survey/STScI. Metadane CDS wskazują licencję HiPS **ODbL 1.0** oraz wymagane informacje o pochodzeniu danych. Raster jest wyświetlany przez **Aladin Lite** rozwijany przez CDS; aktualny kod Aladin Lite jest udostępniany jako **LGPL-3.0-or-later**.
+
+Techniczna warstwa fallback gwiazd nadal korzysta z **HYG v4.1** (David Nash / Astronexus), udostępnianego na licencji **CC BY-SA 4.0**. AstroPlanner pobiera kompaktową reprezentację katalogu przygotowaną w projekcie `bryancurran/celestial-cartography`. Warstwy DSO pozostają oparte na źródłach OpenNGC / Stellarium / SIMBAD opisanych wcześniej.
+
+Pełne informacje o źródłach, licencjach i attribution znajdują się w [`THIRD_PARTY-NOTICES.md`](THIRD_PARTY-NOTICES.md).
 
 ## Copyright
 
