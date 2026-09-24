@@ -17,7 +17,7 @@ https://mykonidpl.github.io/AstroPlanner/
 ## Główne obszary
 
 - **Projekty** — kolejka „Do realizacji”, aktywne i archiwalne cele wraz z postępem integracji.
-- **Planner** — pełna mapa nieba **DSS2 Color** z katalogowymi nazwami DSO, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS. Raster jest pasywnym tłem; sterowanie mapą, FOV, rotacją i mozaiką pozostaje po stronie AstroPlannera.
+- **Planner** — pełna mapa nieba **DSS2 Color** z katalogowymi nazwami DSO, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS. Planner pokazuje także **Score 0–100** bieżącego celu oraz ranking **„Co fotografować?”** dla projektów „Do realizacji” i „Aktywnych”. Raster jest pasywnym tłem; sterowanie mapą, FOV, rotacją i mozaiką pozostaje po stronie AstroPlannera.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
 - **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
 
@@ -34,6 +34,24 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.14 — Score obiektu i ranking „Co fotografować?”
+
+- dodano system **Score 0–100** oceniający warunki astrofotograficzne dla bieżącego celu w wybranej nocy,
+- Score w sekcji **Analiza** uwzględnia datę, lokalizację, minimalną wysokość, tryb nocy, położenie Księżyca, jasność nieba SQM/Bortle, charakter sygnału obiektu oraz profil planowanego materiału/filtra,
+- dodano moduł **„Co fotografować?”**, który porównuje projekty ze statusami **Do realizacji** (`planned`) i **Aktywne** (`active`) dla aktualnie ustawionej nocy Plannera; projekty archiwalne nie uczestniczą w rankingu,
+- każdy projekt w rankingu otrzymuje Score 0–100, krótkie uzasadnienie oraz wyliczone użyteczne okno obserwacyjne,
+- Analiza bieżącego projektu i ranking korzystają z tego samego silnika `AstroRecommend.scoreTarget()`, dzięki czemu ten sam projekt przy tych samych warunkach otrzymuje ten sam Score w obu miejscach,
+- przy projekcie z zapisanym kadrem Analiza i ranking korzystają z tych samych współrzędnych środka kadru,
+- przed obliczeniem Score obie ścieżki przygotowują te same metadane sygnału obiektu; usunięto dodatkowy cache SQM/Bortle w Score bieżącego celu, który mógł prowadzić do rozbieżności względem rankingu,
+- logika oceny i rekomendacji korzysta z modułów `recommendation-engine.js`, `target-metadata.js`, `filter-profiles.js` i `bortle-indicator.js`.
+
+### v0.14 — czysty Start / usunięcie FOUC
+
+- minimalistyczny ekran Start jest zapisany bezpośrednio w `index.html`, dzięki czemu poprzedni ekran nie pojawia się już na pierwszej klatce renderowania,
+- finalne style Startu są statyczne w `ui-shell.css`; usunięto późną podmianę ekranu przez `ui-state.js`,
+- usunięto nieużywaną logikę liczników i stare elementy ekranu Start,
+- aktualny cache PWA produkcji: `astroplanner-v014-home-clean1`.
 
 ### v0.14 — synchronizacja rastra DSS2 z działającym R&D
 
