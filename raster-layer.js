@@ -15,7 +15,7 @@
   let shell=null,stage=null,host=null;
   let aladin=null,initPromise=null,stageObserver=null,resizeObserver=null;
   let syncFrame=0,resizeKick=0,probeTimer=0,retryTimer=0,retryCount=0,tileProbeCount=0;
-  let last={ra:NaN,dec:NaN,fov:NaN},failed=false,tileState='idle',lastError='';
+  let last={ra:NaN,dec:NaN,fov:NaN},failed=false,tileState='idle',lastError='',retainDuringRefresh=false;
 
   function injectStyle(){
     if(document.getElementById('astroRasterStyle'))return;
@@ -86,7 +86,7 @@
     try{aladin?.destroy?.();}catch(_){}try{aladin?.dispose?.();}catch(_){}
     aladin=null;initPromise=null;
     if(!global.A?.aladin)document.querySelector(`script[src="${ALADIN_URL}"]`)?.remove();
-    failed=false;last={ra:NaN,dec:NaN,fov:NaN};tileState='idle';setRasterVisible(false);
+    failed=false;last={ra:NaN,dec:NaN,fov:NaN};tileState='idle';retainDuringRefresh=false;setRasterVisible(false);
     if(host)host.replaceChildren();
   }
 
@@ -122,7 +122,7 @@
       try{
         if(!ensureShell())throw new Error('brak kontenera mapy');
         const sz=sizeHost(),initial=plannerView();if(!sz||!initial)throw new Error('mapa nie jest jeszcze widoczna');
-        setRasterVisible(false);tileState='loading';
+        retainDuringRefresh=false;setRasterVisible(false);tileState='loading';
         await loadAladin();if(global.A?.init)await global.A.init;sizeHost();
         aladin=global.A.aladin('#astroRasterHost',{
           target:initial.ra+' '+initial.dec,fov:initial.fov,projection:'TAN',cooFrame:'ICRSd',survey:DSS2_SURVEY,backgroundColor:'rgb(7,16,28)',
@@ -155,7 +155,7 @@
     const sz=aladin.getSize?.()||[],w=Number(sz[0])||0,h=Number(sz[1])||0;if(w<40||h<40){scheduleProbe(450);return;}
     const xs=[.14,.30,.50,.70,.86],ys=[.16,.37,.59,.82],pixels=[];
     for(const y of ys)for(const x of xs){const rgb=pixelRgb(w*x,h*y);if(rgb)pixels.push(rgb);}
-    if(pixels.length<5){tileState='waiting';setRasterVisible(false);if(++tileProbeCount<=MAX_TILE_PROBES)scheduleProbe(550);else failTileProbe('brak danych pikseli DSS2');return;}
+    if(pixels.length<5){tileState='waiting';if(!retainDuringRefresh)setRasterVisible(false);if(++tileProbeCount<=MAX_TILE_PROBES)scheduleProbe(550);else failTileProbe('brak danych pikseli DSS2');return;}
 
     const ls=pixels.map(luminance),lMin=Math.min(...ls),lMax=Math.max(...ls),lMean=ls.reduce((a,b)=>a+b,0)/ls.length;
     const channelRange=[0,1,2].reduce((sum,c)=>sum+Math.max(...pixels.map(p=>p[c]))-Math.min(...pixels.map(p=>p[c])),0);
@@ -165,14 +165,14 @@
     const hasStructure=(lMax-lMin)>4||channelRange>16||bgDistance>55;
 
     if(!nearWhite&&!nearBackground&&hasStructure){
-      tileState='tile✓';tileProbeCount=0;failed=false;lastError='';retryCount=0;setRasterVisible(true);suppressAladinOverlays();return;
+      tileState='tile✓';tileProbeCount=0;failed=false;lastError='';retryCount=0;retainDuringRefresh=false;setRasterVisible(true);suppressAladinOverlays();return;
     }
-    tileState=nearWhite?'blank-white':'waiting';setRasterVisible(false);
+    tileState=nearWhite?'blank-white':'waiting';if(!retainDuringRefresh)setRasterVisible(false);
     if(++tileProbeCount<=MAX_TILE_PROBES)scheduleProbe(550);else failTileProbe(nearWhite?'biały/pusty canvas DSS2':'DSS2 nie narysował potwierdzonej zawartości');
   }
 
   function failTileProbe(message){
-    failed=true;lastError=message;tileState='fallback';setRasterVisible(false);console.warn('AstroPlanner raster:',message);scheduleRetry(900);
+    failed=true;lastError=message;tileState='fallback';retainDuringRefresh=false;setRasterVisible(false);console.warn('AstroPlanner raster:',message);scheduleRetry(900);
   }
   function scheduleProbe(delay=500){clearTimeout(probeTimer);probeTimer=setTimeout(probeTiles,delay);}
 
@@ -182,7 +182,15 @@
     const moved=!Number.isFinite(last.ra)||Math.abs(view.ra-last.ra)>1e-5||Math.abs(view.dec-last.dec)>1e-5;
     const zoomed=!Number.isFinite(last.fov)||Math.abs(view.fov-last.fov)>1e-4;
     try{
-      if(moved||zoomed){setRasterVisible(false);tileState='loading';tileProbeCount=0;}
+      if(moved||zoomed){
+        // Once DSS2 has been positively verified, keep the raster visible while
+        // Aladin redraws a neighbouring view. Hiding it on every live pan frame
+        // made the survey disappear for the whole drag and return only after
+        // the final tile probe. A failed probe still drops to the SVG fallback.
+        retainDuringRefresh=(tileState==='tile✓'&&!failed)||retainDuringRefresh;
+        if(!retainDuringRefresh)setRasterVisible(false);
+        tileState=retainDuringRefresh?'refreshing':'loading';tileProbeCount=0;
+      }
       if(moved)aladin.gotoRaDec(view.ra,view.dec);if(zoomed)aladin.setFov(view.fov);enforceGridOffAfterRedraw();last=view;suppressAladinOverlays();
       if(moved||zoomed)scheduleProbe(650);else if(tileState==='tile✓')setRasterVisible(true);else if(!probeTimer)scheduleProbe(450);
     }catch(err){failed=true;lastError=String(err?.message||err||'błąd synchronizacji rastra');setRasterVisible(false);console.warn('AstroPlanner raster sync:',err);scheduleRetry(900);}

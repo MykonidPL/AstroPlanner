@@ -19,7 +19,7 @@ Aktualizacja repozytorium przez GitHub
 3. Pliki o tych samych nazwach zastąp; nowe moduły dodaj.
 4. Zrób jeden commit wydania, np. „Release AstroPlanner v0.14”.
 5. Poczekaj na publikację GitHub Pages i uruchom Settings / Pages -> Visit site.
-6. W razie starego UI zamknij i ponownie uruchom PWA/przeglądarkę; service worker v0.14 ma własny cache `astroplanner-v014`.
+6. W razie starego UI zamknij i ponownie uruchom PWA/przeglądarkę; service worker v0.14 ma własny cache `astroplanner-v014-raster-pan1`.
 
 Kompatybilność danych
 - v0.14 zachowuje produkcyjne klucze localStorage używane przez v0.13.1; projekty, sesje, sprzęt, profile, lokalizacje, darki i ustawienia nie wymagają migracji,

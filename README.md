@@ -74,10 +74,11 @@ Promocja zakończonego etapu R&D do repozytorium produkcyjnego. Wersja zachowuje
 - dodano profile filtrów i regułę zgodności filtra z naturą sygnału; continuum nie dostaje premii tylko dlatego, że filtr tłumi tło,
 - dodano warstwę `target-metadata.js` z typem fizycznym, klasą fotograficzną, confidence i metadanymi sygnału; naprawiono m.in. przypadek M45, gdzie jasność gwiazd Plejad nie może udawać jasności pyłu/refleksów,
 - poprawiono lifecycle DSS2: pusty/biały canvas Aladin nie może przykryć technicznego fallbacku,
+- poprawiono panowanie mapy: po pierwszym potwierdzeniu DSS2 raster pozostaje widoczny podczas przeciągania, a weryfikacja nowych kafli odbywa się bez gaszenia warstwy; błędny/pusty DSS2 nadal przełącza mapę na fallback,
 - zachowano zapis RA/Dec/PA, FOV, mozaik i framingu projektów oraz dotychczasową logikę Projektów, Sesji i Dziennika,
 - dodano moduły `bortle-indicator.js`, `filter-profiles.js`, `recommendation-engine.js` i `target-metadata.js`,
 - zachowano produkcyjne klucze `localStorage` oraz bazę snapshotów `astroplanner-project-snapshots`, więc aktualizacja z v0.13.1 nie wymaga migracji danych,
-- cache PWA produkcji podniesiono do `astroplanner-v014`.
+- cache PWA produkcji podniesiono do `astroplanner-v014-raster-pan1`,
 
 ### v0.13.1
 
