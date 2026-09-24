@@ -1,4 +1,4 @@
-# Third-party notices — AstroPlanner v0.12
+# Third-party notices — AstroPlanner v0.13
 
 AstroPlanner application code is licensed separately under the repository's `LICENSE`. The astronomical catalog data listed below remains subject to its own upstream licence and attribution terms.
 
@@ -25,7 +25,7 @@ AstroPlanner uses Aladin Lite only as the browser-side HiPS raster renderer. Ast
 - Metadata / attribution record: https://alasky.cds.unistra.fr/MocServer/query?ID=CDS%2FP%2FDSS2%2Fcolor&fmt=html&get=record
 - STScI DSS copyright information: https://archive.stsci.edu/dss/copyright.html
 
-The CDS metadata states that the color HiPS is composed from DSS2 red and blue surveys generated from original scanned plates obtained from STScI, with the green channel derived from the other components. It also carries the Digitized Sky Survey acknowledgement identifying STScI and the originating Palomar/UK Schmidt photographic surveys. AstroPlanner does not redistribute DSS2 tiles; the application requests them from the external HiPS service at runtime.
+The CDS metadata states that the color HiPS is composed from DSS2 red and blue surveys generated from original scanned plates obtained from STScI, with the green channel derived from the other components. It also carries the Digitized Sky Survey acknowledgement identifying STScI and the originating Palomar/UK Schmidt photographic surveys. AstroPlanner does not redistribute DSS2 tiles; the application requests them from the external HiPS service at runtime. For project previews, AstroPlanner may keep a regenerable snapshot of the current DSS2 framing view locally on the user device in IndexedDB. This preview cache is not bundled with the repository and is not included in the JSON backup export.
 
 ## HYG star database v4.1
 

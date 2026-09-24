@@ -1,17 +1,18 @@
 (function(global){
   'use strict';
 
-  // AstroPlanner v0.12 — DSS2 Color full-sky raster layer
+  // AstroPlanner v0.13 — DSS2 Color full-sky raster layer with bounded recovery + snapshot export
   // One consistent full-sky raster. No declination cutoffs, survey switching or fallbacks.
 
   const ALADIN_URL='https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js';
   const DSS2_SURVEY='P/DSS2/color';
   const D2R=Math.PI/180,R2D=180/Math.PI;
   const BG=[7,16,28];
+  const MAX_RETRIES=3;
 
   let shell=null,stage=null,host=null;
   let aladin=null,initPromise=null,stageObserver=null,resizeObserver=null;
-  let syncFrame=0,resizeKick=0,probeTimer=0,last={ra:NaN,dec:NaN,fov:NaN},failed=false,tileState='…';
+  let syncFrame=0,resizeKick=0,probeTimer=0,retryTimer=0,retryCount=0,last={ra:NaN,dec:NaN,fov:NaN},failed=false,tileState='…',lastError='';
 
   function injectStyle(){
     if(document.getElementById('astroRasterStyle'))return;
@@ -198,10 +199,42 @@
     return true;
   }
 
+  function plannerActive(){
+    const page=stage?.closest?.('.page');
+    return !page||page.classList.contains('active');
+  }
+
+  function resetRasterForRetry(){
+    clearTimeout(probeTimer);
+    try{aladin?.destroy?.();}catch(_){}
+    try{aladin?.dispose?.();}catch(_){}
+    aladin=null;
+    initPromise=null;
+    if(!global.A?.aladin){document.querySelector(`script[src="${ALADIN_URL}"]`)?.remove();}
+    failed=false;
+    last={ra:NaN,dec:NaN,fov:NaN};
+    tileState='…';
+    shell?.classList?.remove('astroRasterReady');
+    if(host){host.style.opacity='0';host.replaceChildren();}
+  }
+
+  function scheduleRetry(delay=null){
+    if(retryTimer||retryCount>=MAX_RETRIES)return;
+    const wait=delay==null?[1200,2500,5000][retryCount]||5000:delay;
+    retryTimer=setTimeout(()=>{
+      retryTimer=0;
+      if(!plannerActive())return;
+      retryCount++;
+      resetRasterForRetry();
+      scheduleSync();
+    },wait);
+  }
+
   function loadAladin(){
     if(global.A?.aladin)return Promise.resolve();
     return new Promise((resolve,reject)=>{
-      const existing=document.querySelector(`script[src="${ALADIN_URL}"]`);
+      let existing=document.querySelector(`script[src="${ALADIN_URL}"]`);
+      if(existing?.dataset?.astroLoadFailed==='1'){existing.remove();existing=null;}
       if(existing){
         const started=Date.now();
         const wait=()=>{
@@ -216,8 +249,8 @@
       s.src=ALADIN_URL;
       s.charset='utf-8';
       s.async=true;
-      s.onload=()=>resolve();
-      s.onerror=()=>reject(new Error('nie udało się pobrać Aladin Lite'));
+      s.onload=()=>{s.dataset.astroLoaded='1';resolve();};
+      s.onerror=()=>{s.dataset.astroLoadFailed='1';reject(new Error('nie udało się pobrać Aladin Lite'));};
       document.head.appendChild(s);
     });
   }
@@ -305,6 +338,10 @@
         }
 
         failed=false;
+        retryCount=0;
+        clearTimeout(retryTimer);
+        retryTimer=0;
+        lastError='';
         tileState='…';
         enforceGridOffAfterRedraw();
         scheduleProbe(900);
@@ -315,9 +352,11 @@
           throw err;
         }
         failed=true;
+        lastError=String(err?.message||err||'błąd rastra');
         shell?.classList?.remove('astroRasterReady');
         if(host)host.style.opacity='0';
         console.warn('AstroPlanner raster:',err);
+        scheduleRetry();
         throw err;
       }finally{
         if(!aladin)initPromise=null;
@@ -405,6 +444,7 @@
     if(!ensureShell())return;
     const view=plannerView();
     if(!view)return;
+    if(failed){if(plannerActive())scheduleRetry(450);return;}
 
     try{await initAladin();}catch(_){return;}
     if(!aladin||failed)return;
@@ -426,9 +466,29 @@
         scheduleProbe(700);
       }
     }catch(err){
+      failed=true;
+      lastError=String(err?.message||err||'błąd synchronizacji rastra');
       shell?.classList?.remove('astroRasterReady');
       host.style.opacity='0';
       console.warn('AstroPlanner raster sync:',err);
+      scheduleRetry(900);
+    }
+  }
+
+  async function captureView(format='image/jpeg'){
+    if(!plannerActive()||failed||!aladin||typeof aladin.getViewDataURL!=='function')return null;
+    const view=plannerView(),sz=aladin.getSize?.()||[];
+    if(!view||Number(sz[0])<40||Number(sz[1])<40)return null;
+    try{
+      disableAladinGrid();
+      suppressAladinOverlays();
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const raw=aladin.getViewDataURL(format),dataUrl=raw&&typeof raw.then==='function'?await raw:raw;
+      if(typeof dataUrl!=='string'||!dataUrl.startsWith('data:image/'))return null;
+      return{dataUrl,width:Number(sz[0])||0,height:Number(sz[1])||0,view:{...view},tileState};
+    }catch(err){
+      console.warn('AstroPlanner raster snapshot:',err);
+      return null;
     }
   }
 
@@ -448,8 +508,13 @@
 
   global.AstroRasterLayer={
     sync:scheduleSync,
+    captureView,
     getStatus:()=>({
       ready:!!aladin&&!failed,
+      recovering:!!retryTimer,
+      retryCount,
+      maxRetries:MAX_RETRIES,
+      lastError,
       source:DSS2_SURVEY,
       activeSurvey:'dss2-color',
       fullSky:true,

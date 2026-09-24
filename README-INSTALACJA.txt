@@ -1,1 +1,17 @@
-AstroPlanner v0.12 — aktualizacja zachowuje wszystkie funkcje i dane zgodne z v0.11.5.6 oraz dodaje pełną mapę DSS2 Color. Wgraj pliki z paczki do głównego katalogu repozytorium GitHub Pages, zastępując pliki o tych samych nazwach i dodając raster-layer.js. Mapa Plannera używa DSS2 Color przez Aladin Lite jako pasywnego rastra pod istniejącym SVG AstroPlannera; pan/zoom, FOV, rotacja, mozaika, siatka RA/Dec, target i etykiety nadal są sterowane przez AstroPlanner. DSS2/Aladin wymagają połączenia z siecią do pobrania obrazu. Gdy raster jest niedostępny, pozostaje techniczna mapa v0.11.5.6 z warstwą HYG i katalogami DSO. Po wdrożeniu otwórz GitHub Pages i wykonaj test aktualizacji PWA/cache.
+AstroPlanner v0.13 — aktualizacja produkcyjna
+
+Pakiet jest przeznaczony do repozytorium MykonidPL/AstroPlanner i aktualizuje produkcyjny AstroPlanner v0.12 do v0.13.
+
+Wgraj całą zawartość paczki do katalogu głównego repozytorium, zastępując pliki o tych samych nazwach. Nowe pliki ui-shell.css, ui-state.js i snapshot-store.js również muszą znaleźć się w root repozytorium. Nie twórz dodatkowych folderów.
+
+Aktualizacja zachowuje dotychczasowe dane projektów, sesji, sprzętu, lokalizacji i bibliotek kalibracji zapisane w przeglądarce/PWA. Przed wdrożeniem warto wykonać Eksport JSON jako kopię zapasową.
+
+Po commicie otwórz GitHub Pages -> Visit site i sprawdź:
+1. Start oraz dolną nawigację.
+2. Planner: pusty stan -> wybór obiektu -> DSS2 -> kadr/FOV.
+3. Zapis projektu i rasterowy podgląd w Projekcie oraz Dzienniku.
+4. Dodanie/edycję sesji.
+5. Sprzęt i dane.
+6. Zamknięcie i ponowne uruchomienie PWA.
+
+Service worker używa cache astroplanner-v013. Po pierwszym wejściu po aktualizacji aplikacja może wykonać jeden automatyczny reload po przejęciu nowego service workera.

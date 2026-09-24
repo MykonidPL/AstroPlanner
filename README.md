@@ -4,7 +4,7 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.12 — Public Beta**
+**v0.13 — Public Beta**
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -14,7 +14,7 @@ https://mykonidpl.github.io/AstroPlanner/
 
 ## Główne obszary
 
-- **Projekty** — aktywne, planowane i zakończone cele wraz z postępem integracji.
+- **Projekty** — kolejka „Do realizacji”, aktywne i archiwalne cele wraz z postępem integracji.
 - **Planner** — pełna mapa nieba **DSS2 Color** z katalogowymi nazwami DSO, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS. Raster jest pasywnym tłem; sterowanie mapą, FOV, rotacją i mozaiką pozostaje po stronie AstroPlannera.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
 - **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
@@ -32,6 +32,23 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.13
+
+Pełna integracja nowego interfejsu AstroPlannera po zakończonym cyklu testów rozwojowych. Wydanie zachowuje model danych produkcyjnego v0.12 i konsoliduje przebudowę UI, stabilizację mapy DSS2 oraz podglądy projektów.
+
+- dodano ekran startowy z podsumowaniem lokalnych danych oraz stałą dolną nawigację **Planer / Projekty / Dziennik / Sprzęt**,
+- przebudowano Projekty na przepływ **Do realizacji → Aktywne → Archiwum**; pierwszy zapis sesji nadal automatycznie aktywuje projekt,
+- Planner działa jako czysty, tymczasowy workspace: przy zwykłym wejściu nie odtwarza starego celu ani kadru, a zapis projektu lub wyjście z Plannera resetuje stan roboczy,
+- przed wyborem obiektu mapa pozostaje pusta; po wyborze celu DSS2 Color jest głównym tłem, a warunki nocy, analiza i tworzenie projektu są dostępne w zwijanych panelach,
+- warstwa DSS2 otrzymała ograniczony mechanizm recovery po błędach inicjalizacji/synchronizacji; w razie niedostępności sieci lub Aladin Lite nadal działa techniczny fallback,
+- zapis projektu/kadru może tworzyć statyczny podgląd **DSS2 + FOV / marker celu** przechowywany jako regenerowalny cache w IndexedDB; ten sam podgląd jest używany w Projekcie i Dzienniku bez uruchamiania dodatkowych instancji Aladin/WebGL,
+- formularz sesji zapisuje bezpośrednio liczbę **użytecznych LIGHT**; starsze sesje zachowują historyczne dane o odrzuconych klatkach,
+- Sprzęt i dane zostały przebudowane na zwijane kategorie z licznikami; formularze pojawiają się dopiero przy dodawaniu lub edycji elementu,
+- Dziennik startuje ze zwiniętymi grupami; wejście przez **Historia sesji** otwiera wyłącznie wskazany projekt, a destrukcyjne usuwanie sesji zostało przeniesione do drugorzędnej sekcji zarządzania,
+- dodano moduły `ui-shell.css`, `ui-state.js` i `snapshot-store.js`; `raster-layer.js` zawiera stabilizację lifecycle'u rastra i eksport podglądu,
+- zachowano istniejące klucze danych projektów, sesji, sprzętu, lokalizacji i bibliotek kalibracji; aktualizacja z v0.12 nie wymaga destrukcyjnej migracji danych,
+- cache PWA produkcji podniesiono do `astroplanner-v013`.
 
 ### v0.12
 
@@ -374,7 +391,7 @@ Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, kore
 
 ## Dane astronomiczne i licencje zewnętrzne
 
-Główna mapa v0.12 korzysta z **DSS2 Color** (`P/DSS2/color`) przygotowanego jako HiPS przez CDS na podstawie danych Digitized Sky Survey/STScI. Metadane CDS wskazują licencję HiPS **ODbL 1.0** oraz wymagane informacje o pochodzeniu danych. Raster jest wyświetlany przez **Aladin Lite** rozwijany przez CDS; aktualny kod Aladin Lite jest udostępniany jako **LGPL-3.0-or-later**.
+Główna mapa AstroPlannera korzysta z **DSS2 Color** (`P/DSS2/color`) przygotowanego jako HiPS przez CDS na podstawie danych Digitized Sky Survey/STScI. Metadane CDS wskazują licencję HiPS **ODbL 1.0** oraz wymagane informacje o pochodzeniu danych. Raster jest wyświetlany przez **Aladin Lite** rozwijany przez CDS; aktualny kod Aladin Lite jest udostępniany jako **LGPL-3.0-or-later**.
 
 Techniczna warstwa fallback gwiazd nadal korzysta z **HYG v4.1** (David Nash / Astronexus), udostępnianego na licencji **CC BY-SA 4.0**. AstroPlanner pobiera kompaktową reprezentację katalogu przygotowaną w projekcie `bryancurran/celestial-cartography`. Warstwy DSO pozostają oparte na źródłach OpenNGC / Stellarium / SIMBAD opisanych wcześniej.
 
