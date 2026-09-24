@@ -18,35 +18,10 @@ https://mykonidpl.github.io/AstroPlanner/
 
 - **Projekty** — kolejka „Do realizacji”, aktywne i archiwalne cele wraz z postępem integracji.
 - **Planner** — pełna mapa nieba **DSS2 Color** z katalogowymi nazwami DSO, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS. Raster jest pasywnym tłem; sterowanie mapą, FOV, rotacją i mozaiką pozostaje po stronie AstroPlannera.
-- **Co fotografować?** — ranking aktywnych i planowanych projektów dla bieżącej daty, lokalizacji i warunków Plannera, liczony tym samym silnikiem co `Score` aktualnie wybranego celu.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
 - **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
 
 AstroPlanner działa jako PWA i jest projektowany przede wszystkim do wygodnej obsługi na telefonie oraz pracy terenowej.
-
-## Rekomendacje i Score
-
-`Score` 0–100 jest użytkowym indeksem rankingowym dla konkretnej nocy Plannera, a nie jednostką fizyczną ani gwarancją jakości zdjęcia. Model bierze pod uwagę m.in. użyteczne okno nad minimalną wysokością, tryb nocy, przebieg wysokości/transmisji atmosferycznej, Księżyc, modelowane tło nieba (SQM/LP), rzeczywisty materiał i profil filtra oraz dostępne metadane sygnału obiektu.
-
-Najważniejsze zasady modelu:
-
-- szerokie pasmo, emisja i pyły nie dostają arbitralnych stałych bonusów/kar; wynik ma wynikać z geometrii, tła, filtra i danych o sygnale,
-- filtr wąskopasmowy może pomóc tylko wtedy, gdy jest zgodny z naturą sygnału; tłumienie tła samo w sobie nie daje bonusu obiektowi continuum,
-- dla galaktyk i innych rozciągłych obiektów continuum wykorzystywana jest, gdy dostępna, fotometria i średnia jasność powierzchniowa,
-- dla ciemnych mgławic używane są dane o absorpcji/opacity zamiast sztucznego magnitudo,
-- gdy porównywalna fotometria sygnału nie istnieje, model pozostaje konserwatywny i nie wymyśla strumienia,
-- przypadki, w których katalogowa fotometria opisuje inny komponent niż fotografowany (np. jasność gwiazd gromady przy fotografowaniu pyłu), są odseparowane od modelu sygnału.
-
-Wyniki bliskie sobie należy interpretować ostrożnie, szczególnie gdy obiekty mają różną kompletność danych katalogowych.
-
-## Źródła danych używane przez v0.14
-
-- DSS2 Color przez Aladin Lite jako raster mapy Plannera,
-- HYG v4.1 i katalogi DSO jako warstwy techniczne/fallback,
-- przypięty zestaw katalogów `acocalypso/celestia_atlas` dla OpenNGC, Stellarium supplement i Abell PN,
-- David Lorenz Light Pollution Atlas 2025 dla modelowanej jasności zenitu i przybliżonego wskaźnika `Bortle ≈ X`.
-
-Szczegóły licencji i atrybucji znajdują się w `THIRD_PARTY-NOTICES.md`.
 
 ## Dane i backup
 
@@ -60,25 +35,13 @@ Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, kore
 
 ## Historia zmian
 
-### v0.14
+### v0.14 — synchronizacja rastra DSS2 z działającym R&D
 
-Promocja zakończonego etapu R&D do repozytorium produkcyjnego. Wersja zachowuje model danych v0.13.1 i dodaje warstwę rekomendacji oraz fizycznie bardziej uzasadniony model Score.
-
-- Start został uproszczony do logo, nazwy aplikacji i wersji; stała dolna nawigacja pozostaje **Planer / Projekty / Dziennik / Sprzęt**,
-- Planner ma zatwierdzony układ: **Mapa nieba → Warunki nocy → Co fotografować? → Analiza → Dodaj do realizacji**,
-- `Co fotografować?` rankinguje obecnie **Moje projekty** (`Do realizacji` i `Aktywne`); projekty archiwalne są pomijane,
-- `Score` aktualnego obiektu jest czwartą metryką Analizy i jest prezentowany jako radialny ring 0–100,
-- ranking i aktualny cel korzystają z jednego silnika `AstroRecommend.scoreTarget()`,
-- dodano modelowane tło nieba na bazie David Lorenz Light Pollution Atlas 2025; UI pokazuje przybliżone `Bortle ≈ X`, a scoring korzysta z ciągłej wartości jasności/SQM,
-- przebudowano scoring wysokości i tła: oceniane jest całe użyteczne okno Plannera, a koszt jaśniejszego tła jest powiązany z względną wydajnością S/N,
-- dodano profile filtrów i regułę zgodności filtra z naturą sygnału; continuum nie dostaje premii tylko dlatego, że filtr tłumi tło,
-- dodano warstwę `target-metadata.js` z typem fizycznym, klasą fotograficzną, confidence i metadanymi sygnału; naprawiono m.in. przypadek M45, gdzie jasność gwiazd Plejad nie może udawać jasności pyłu/refleksów,
-- poprawiono lifecycle DSS2: pusty/biały canvas Aladin nie może przykryć technicznego fallbacku,
-- poprawiono panowanie mapy: po pierwszym potwierdzeniu DSS2 raster pozostaje widoczny podczas przeciągania, a weryfikacja nowych kafli odbywa się bez gaszenia warstwy; błędny/pusty DSS2 nadal przełącza mapę na fallback,
-- zachowano zapis RA/Dec/PA, FOV, mozaik i framingu projektów oraz dotychczasową logikę Projektów, Sesji i Dziennika,
-- dodano moduły `bortle-indicator.js`, `filter-profiles.js`, `recommendation-engine.js` i `target-metadata.js`,
-- zachowano produkcyjne klucze `localStorage` oraz bazę snapshotów `astroplanner-project-snapshots`, więc aktualizacja z v0.13.1 nie wymaga migracji danych,
-- cache PWA produkcji podniesiono do `astroplanner-v014-raster-pan1`,
+- produkcja używa dokładnie tej samej logiki `raster-layer.js` co potwierdzony działający stan R&D z commita `119eec15538e8c67d9aab4e7aecaf5c23e5ac4c3`,
+- raster został cofnięty do stabilnej implementacji sprzed regresji walidowania/wygaszania viewportu (`raster-layer.js` blob `6248206e37f7275a8f355088b0589a304bf2d6e8`),
+- pan i zoom działają jak w stabilnej implementacji: Aladin utrzymuje żywą warstwę DSS2 i dociąga kafle w tle,
+- produkcja zachowuje własne dane użytkownika (`localStorage` bez prefiksu R&D oraz `astroplanner-project-snapshots`),
+- cache PWA produkcji: `astroplanner-v014-raster-preregression1`.
 
 ### v0.13.1
 
