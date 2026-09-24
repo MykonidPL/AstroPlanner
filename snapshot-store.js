@@ -1,4 +1,4 @@
-/* AstroPlanner v0.13 — regenerable DSS2 project snapshot cache */
+/* AstroPlanner v0.13.1 — regenerable DSS2 project snapshot cache */
 (()=>{
   'use strict';
 

@@ -1,4 +1,4 @@
-/* AstroPlanner v0.13 — UI shell / design-system */
+/* AstroPlanner v0.13.1 — UI shell / design-system */
 :root{
   --ui-bg:#080c16;
   --ui-surface:#111827;
@@ -148,6 +148,7 @@ body[data-page="home"] .bottomNav{opacity:0;pointer-events:none;transform:transl
 .projectCompactMeta span{display:inline-flex;align-items:center;min-height:25px;padding:4px 8px;border:1px solid var(--ui-border);border-radius:999px;background:rgba(17,28,48,.72);font-size:10px;color:#bdcae2;line-height:1.2}
 .projectQuickActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
 .projectQuickActions button{width:100%;min-width:0;display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px}
+.projectQuickActions .projectArchiveDelete{grid-column:1/-1;min-height:38px;background:rgba(43,24,32,.52);box-shadow:none}
 .projectActionIcon{width:17px;height:17px;display:inline-block;flex:0 0 auto;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .projectDetailsV2{margin-top:9px;border-top:1px solid rgba(157,181,225,.11)}
 .projectDetailsV2>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;padding:11px 2px 2px;color:#cbd7ec;font-size:12px;font-weight:760}
@@ -386,21 +387,14 @@ body[data-page="home"] .bottomNav{opacity:0;pointer-events:none;transform:transl
 .journalSessionCard .journalTitle>div{min-width:0}
 .journalSessionCard .journalTitle .projectmeta{white-space:normal;line-height:1.4}
 .sessionHours{font-size:12px;white-space:nowrap;color:#dbe7fb;font-variant-numeric:tabular-nums}
-.journalSessionCard .sessionEntryActions{display:grid;grid-template-columns:1fr;gap:0;padding:0 10px 9px}
+.journalSessionCard .sessionEntryActions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:0 10px 9px}
 .journalSessionCard .sessionEntryActions button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:7px 10px;font-size:11px}
 .journalSessionCard .sessionEntryActions .projectActionIcon{width:15px;height:15px}
+.journalSessionCard .sessionEntryActions .sessionDeleteBtn{min-width:84px;background:rgba(43,24,32,.52);box-shadow:none}
 .journalSessionCard .sessionDetails>summary{padding:9px 11px;font-size:11px;color:#bfcee7}
 .journalSessionCard .sessionEntryBody{padding:9px 10px 10px}
 .journalSessionCard .sessionDetailSection{margin-top:7px}
 .journalSessionCard .sessionDetailSection:first-child{margin-top:0}
-.sessionManage{margin-top:9px;border:1px solid rgba(255,124,124,.14);border-radius:9px;background:rgba(43,24,32,.28);overflow:hidden}
-.sessionManage>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;padding:9px 10px;color:#aab8d0;font-size:10.5px;font-weight:700}
-.sessionManage>summary::-webkit-details-marker{display:none}
-.sessionManage>summary .projectActionIcon{width:15px;height:15px;color:#8392ac}
-.sessionManage[open]>summary{border-bottom:1px solid rgba(255,124,124,.12)}
-.sessionManageBody{padding:9px 10px 10px}
-.sessionManageBody .danger{width:100%;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:7px;min-height:38px}
-.sessionManageBody .danger .projectActionIcon{width:15px;height:15px}
 .sessionHighlight{border-color:rgba(117,169,255,.48)!important;box-shadow:0 0 0 2px rgba(117,169,255,.09)}
 .journalEmptyState{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 14px 20px;color:var(--ui-muted)}
 .journalEmptyState b{font-size:14px;color:#e9f0ff}

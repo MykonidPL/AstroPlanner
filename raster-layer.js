@@ -1,7 +1,7 @@
 (function(global){
   'use strict';
 
-  // AstroPlanner v0.13 — DSS2 Color full-sky raster layer with bounded recovery + snapshot export
+  // AstroPlanner v0.13.1 — DSS2 Color full-sky raster layer with bounded recovery + snapshot export
   // One consistent full-sky raster. No declination cutoffs, survey switching or fallbacks.
 
   const ALADIN_URL='https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js';

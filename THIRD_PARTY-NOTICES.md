@@ -1,4 +1,4 @@
-# Third-party notices — AstroPlanner v0.13
+# Third-party notices — AstroPlanner v0.13.1
 
 AstroPlanner application code is licensed separately under the repository's `LICENSE`. The astronomical catalog data listed below remains subject to its own upstream licence and attribution terms.
 

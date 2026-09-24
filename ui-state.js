@@ -1,4 +1,4 @@
-/* AstroPlanner v0.13 — persistent shell state; Planner workspace and Journal browsing state are intentionally transient */
+/* AstroPlanner v0.13.1 — persistent shell state; Planner workspace and Journal browsing state are intentionally transient */
 (()=>{
   'use strict';
   const UI_KEY='ap0121_ui_state';
