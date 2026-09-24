@@ -1,7 +1,7 @@
 {
-  "name": "AstroPlanner",
+  "name": "AstroPlanner v0.14",
   "short_name": "AstroPlanner",
-  "description": "AstroPlanner v0.13.1 — mobilny planner projektów astrofotograficznych z pełną mapą DSS2 Color, sesjami, sprzętem i dziennikiem.",
+  "description": "Mobilny planner i dziennik projektów astrofotograficznych DSO z mapą DSS2, kadrowaniem i rekomendacjami celów dla wybranej nocy.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

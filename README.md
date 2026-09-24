@@ -4,7 +4,9 @@ Mobilny planner i dziennik projektów astrofotograficznych DSO.
 
 ## Aktualna wersja
 
-**v0.13.1 — Public Beta**
+**v0.14**
+
+Repozytorium produkcyjne: `MykonidPL/AstroPlanner`.
 
 AstroPlanner pomaga prowadzić wielonocne projekty astrofotograficzne: planować cele, oceniać warunki dla wybranej nocy, zapisywać wykonane sesje, śledzić postęp integracji oraz utrzymywać historię użytego sprzętu i materiału kalibracyjnego.
 
@@ -16,10 +18,35 @@ https://mykonidpl.github.io/AstroPlanner/
 
 - **Projekty** — kolejka „Do realizacji”, aktywne i archiwalne cele wraz z postępem integracji.
 - **Planner** — pełna mapa nieba **DSS2 Color** z katalogowymi nazwami DSO, siatką RA/Dec i FOV setupu oraz wysokość obiektu, kulminacja, użyteczne okno, tryb nocy, Księżyc i lokalizacja/GPS. Raster jest pasywnym tłem; sterowanie mapą, FOV, rotacją i mozaiką pozostaje po stronie AstroPlannera.
+- **Co fotografować?** — ranking aktywnych i planowanych projektów dla bieżącej daty, lokalizacji i warunków Plannera, liczony tym samym silnikiem co `Score` aktualnie wybranego celu.
 - **Dziennik** — historia wykonanych sesji pogrupowana według projektów.
 - **Sprzęt** — własna biblioteka teleskopów, kamer, korektorów, filtrów, profili setupów i materiału kalibracyjnego. Profile automatycznie wyliczają światłosiłę, skalę obrazu i FOV.
 
 AstroPlanner działa jako PWA i jest projektowany przede wszystkim do wygodnej obsługi na telefonie oraz pracy terenowej.
+
+## Rekomendacje i Score
+
+`Score` 0–100 jest użytkowym indeksem rankingowym dla konkretnej nocy Plannera, a nie jednostką fizyczną ani gwarancją jakości zdjęcia. Model bierze pod uwagę m.in. użyteczne okno nad minimalną wysokością, tryb nocy, przebieg wysokości/transmisji atmosferycznej, Księżyc, modelowane tło nieba (SQM/LP), rzeczywisty materiał i profil filtra oraz dostępne metadane sygnału obiektu.
+
+Najważniejsze zasady modelu:
+
+- szerokie pasmo, emisja i pyły nie dostają arbitralnych stałych bonusów/kar; wynik ma wynikać z geometrii, tła, filtra i danych o sygnale,
+- filtr wąskopasmowy może pomóc tylko wtedy, gdy jest zgodny z naturą sygnału; tłumienie tła samo w sobie nie daje bonusu obiektowi continuum,
+- dla galaktyk i innych rozciągłych obiektów continuum wykorzystywana jest, gdy dostępna, fotometria i średnia jasność powierzchniowa,
+- dla ciemnych mgławic używane są dane o absorpcji/opacity zamiast sztucznego magnitudo,
+- gdy porównywalna fotometria sygnału nie istnieje, model pozostaje konserwatywny i nie wymyśla strumienia,
+- przypadki, w których katalogowa fotometria opisuje inny komponent niż fotografowany (np. jasność gwiazd gromady przy fotografowaniu pyłu), są odseparowane od modelu sygnału.
+
+Wyniki bliskie sobie należy interpretować ostrożnie, szczególnie gdy obiekty mają różną kompletność danych katalogowych.
+
+## Źródła danych używane przez v0.14
+
+- DSS2 Color przez Aladin Lite jako raster mapy Plannera,
+- HYG v4.1 i katalogi DSO jako warstwy techniczne/fallback,
+- przypięty zestaw katalogów `acocalypso/celestia_atlas` dla OpenNGC, Stellarium supplement i Abell PN,
+- David Lorenz Light Pollution Atlas 2025 dla modelowanej jasności zenitu i przybliżonego wskaźnika `Bortle ≈ X`.
+
+Szczegóły licencji i atrybucji znajdują się w `THIRD_PARTY-NOTICES.md`.
 
 ## Dane i backup
 
@@ -32,6 +59,25 @@ W aplikacji dostępny jest eksport i import kopii zapasowej JSON. Przy regularny
 Nowa instalacja startuje z pustą biblioteką teleskopów, kamer, filtrów, korektorów i profili. Każdy użytkownik dodaje własny sprzęt. Aktualizacja nie usuwa sprzętu już zapisanego lokalnie w przeglądarce.
 
 ## Historia zmian
+
+### v0.14
+
+Promocja zakończonego etapu R&D do repozytorium produkcyjnego. Wersja zachowuje model danych v0.13.1 i dodaje warstwę rekomendacji oraz fizycznie bardziej uzasadniony model Score.
+
+- Start został uproszczony do logo, nazwy aplikacji i wersji; stała dolna nawigacja pozostaje **Planer / Projekty / Dziennik / Sprzęt**,
+- Planner ma zatwierdzony układ: **Mapa nieba → Warunki nocy → Co fotografować? → Analiza → Dodaj do realizacji**,
+- `Co fotografować?` rankinguje obecnie **Moje projekty** (`Do realizacji` i `Aktywne`); projekty archiwalne są pomijane,
+- `Score` aktualnego obiektu jest czwartą metryką Analizy i jest prezentowany jako radialny ring 0–100,
+- ranking i aktualny cel korzystają z jednego silnika `AstroRecommend.scoreTarget()`,
+- dodano modelowane tło nieba na bazie David Lorenz Light Pollution Atlas 2025; UI pokazuje przybliżone `Bortle ≈ X`, a scoring korzysta z ciągłej wartości jasności/SQM,
+- przebudowano scoring wysokości i tła: oceniane jest całe użyteczne okno Plannera, a koszt jaśniejszego tła jest powiązany z względną wydajnością S/N,
+- dodano profile filtrów i regułę zgodności filtra z naturą sygnału; continuum nie dostaje premii tylko dlatego, że filtr tłumi tło,
+- dodano warstwę `target-metadata.js` z typem fizycznym, klasą fotograficzną, confidence i metadanymi sygnału; naprawiono m.in. przypadek M45, gdzie jasność gwiazd Plejad nie może udawać jasności pyłu/refleksów,
+- poprawiono lifecycle DSS2: pusty/biały canvas Aladin nie może przykryć technicznego fallbacku,
+- zachowano zapis RA/Dec/PA, FOV, mozaik i framingu projektów oraz dotychczasową logikę Projektów, Sesji i Dziennika,
+- dodano moduły `bortle-indicator.js`, `filter-profiles.js`, `recommendation-engine.js` i `target-metadata.js`,
+- zachowano produkcyjne klucze `localStorage` oraz bazę snapshotów `astroplanner-project-snapshots`, więc aktualizacja z v0.13.1 nie wymaga migracji danych,
+- cache PWA produkcji podniesiono do `astroplanner-v014`.
 
 ### v0.13.1
 
