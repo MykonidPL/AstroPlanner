@@ -5,7 +5,6 @@
   const DRAFT_KEY='ap0121_form_draft';
   const SCHEMA=1;
   const APP_PAGES=['planner','projects','journal','equipment'];
-  const PAGE_NAMES={planner:'Planer',projects:'Projekty',journal:'Dziennik',equipment:'Sprzęt'};
   const SAVE_DELAY=280;
 
   const readJson=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'')||fallback;}catch(_){return fallback;}};
@@ -53,7 +52,6 @@
     draft={schema:SCHEMA,values:collectValues(),savedAt:Date.now()};
     writeJson(UI_KEY,ui);
     writeJson(DRAFT_KEY,draft);
-    renderHome();
   }
   function scheduleSave(){if(restoring)return;clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,SAVE_DELAY);}
 
@@ -89,18 +87,6 @@
       if(Object.prototype.hasOwnProperty.call(ui.details||{},key))el.open=!!ui.details[key];
     });
   }
-  function renderHome(){
-    try{
-      const projects=typeof getProjects==='function'?getProjects():[];
-      const sessions=typeof getSessions==='function'?getSessions():[];
-      const active=projects.filter(p=>(p.status||'active')==='active').length;
-      const planned=projects.filter(p=>p.status==='planned').length;
-      const a=document.getElementById('homeActiveCount'),p=document.getElementById('homePlannedCount'),s=document.getElementById('homeSessionCount');
-      if(a)a.textContent=String(active);if(p)p.textContent=String(planned);if(s)s.textContent=String(sessions.length);
-      const cont=document.getElementById('homeContinueBtn');
-      if(cont){const page=APP_PAGES.includes(ui.lastPage)?ui.lastPage:'planner';cont.textContent=`Kontynuuj: ${PAGE_NAMES[page]}`;cont.dataset.page=page;cont.style.display=page==='planner'?'none':'';}
-    }catch(_){ }
-  }
   function restoreAll(){
     restoring=true;
     try{
@@ -111,7 +97,6 @@
       try{if(typeof updateCameraKindUI==='function')updateCameraKindUI();}catch(_){}
       try{if(typeof updateProfileMetricsPreview==='function')updateProfileMetricsPreview();}catch(_){}
       restoreDetails();
-      renderHome();
       document.body.dataset.page='home';
     }finally{restoring=false;}
   }
@@ -120,12 +105,11 @@
   function onPageChange(id){
     document.body.dataset.page=id||'home';
     if(APP_PAGES.includes(id)){ui.lastPage=id;writeJson(UI_KEY,{...ui,schema:SCHEMA});}
-    if(id==='home')renderHome();
   }
   function openPlanner(){if(typeof switchPage==='function')switchPage('planner',true);}
   function continueWork(){const p=APP_PAGES.includes(ui.lastPage)?ui.lastPage:'planner';if(typeof switchPage==='function')switchPage(p,true);}
 
-  window.AstroUI={onPageChange,openPlanner,continueWork,saveNow,scheduleSave,renderHome,detailOpen};
+  window.AstroUI={onPageChange,openPlanner,continueWork,saveNow,scheduleSave,detailOpen};
 
   function loadBortleIndicator(){
     if(document.querySelector('script[data-astro-bortle]'))return;
@@ -142,11 +126,6 @@
     const style=document.createElement('style');
     style.id='astroV014LayoutStyle';
     style.textContent=`
-      #home .homeHero{gap:0}
-      #home .homeLogoWrap{width:156px;height:156px;border-radius:40px;padding:9px}
-      #home .homeLogo{border-radius:32px}
-      #home .homeAppName{margin-top:22px;font-size:22px;font-weight:800;letter-spacing:.01em;color:#f3f7ff}
-      #home .homeVersion{margin-top:8px;font-size:10px;letter-spacing:.08em;color:#6f7d99}
       #plannerRecommendationsCard.plannerPanel{padding:0;overflow:hidden}
       #plannerRecommendationsCard .plannerRecommendationEntry{margin:0;padding:0;border-top:0}
       #plannerRecommendationsCard .plannerRecommendationEntry .secondary{width:100%;min-height:46px}
@@ -166,16 +145,6 @@
       .currentScoreMetric.scoreGood .currentScoreRing{--ring:var(--good)}
     `;
     document.head.appendChild(style);
-  }
-
-  function simplifyHome(){
-    const hero=document.querySelector('#home .homeHero');
-    if(!hero||hero.dataset.minimalHome==='1')return;
-    hero.dataset.minimalHome='1';
-    hero.innerHTML=`
-      <div class="homeLogoWrap"><img class="homeLogo" src="./icon-192.png" alt="AstroPlanner"></div>
-      <div class="homeAppName">AstroPlanner</div>
-      <div class="homeVersion">v0.14</div>`;
   }
 
   function placeRecommendationsBetweenNightAndAnalysis(){
@@ -253,7 +222,6 @@
   }
 
   let currentScoreSeq=0;
-  const currentScoreSkyCache=new Map();
   function scoreClass(score){return score>=65?'scoreGood':score>=25&&score<45?'scoreWarn':score<25?'scoreBad':'';}
   function scoreCaption(score){return score>=85?'bardzo dobre':score>=65?'dobre':score>=45?'umiarkowane':score>=25?'słabe':'bardzo słabe';}
 
@@ -283,19 +251,18 @@
   }
 
   async function currentScoreSky(lat,lon){
-    const key=`${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}`;
-    if(currentScoreSkyCache.has(key))return currentScoreSkyCache.get(key);
-    const task=(async()=>{
-      for(let i=0;i<12;i++){
-        if(window.AstroBortle?.estimateAt){try{return await window.AstroBortle.estimateAt(Number(lat),Number(lon));}catch(_){return null;}}
-        await new Promise(resolve=>setTimeout(resolve,100));
+    // AstroBortle already owns the persistent/browser cache. Do not keep a second
+    // Score-only cache here: a transient null/error used to become permanent for
+    // this lat/lon and could make Analysis score without SQM while the ranking
+    // recomputed the same project with SQM a moment later.
+    for(let i=0;i<12;i++){
+      if(window.AstroBortle?.estimateAt){
+        try{return await window.AstroBortle.estimateAt(Number(lat),Number(lon));}
+        catch(_){return null;}
       }
-      return null;
-    })();
-    currentScoreSkyCache.set(key,task);
-    const result=await task;
-    currentScoreSkyCache.set(key,Promise.resolve(result));
-    return result;
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    return null;
   }
 
   function scoreSubject(){
@@ -323,20 +290,38 @@
     const raParser=window.parseRA,decParser=window.parseDec,dateFn=window.sessionDate;
     const astro={altitude:window.altitude,sunPos:window.sunPos,moonPos:window.moonPos,sep:window.sep};
     if(!api||!metaApi||!filterApi||typeof raParser!=='function'||typeof decParser!=='function'||typeof dateFn!=='function'||Object.values(astro).some(fn=>typeof fn!=='function'))return;
-    const raDeg=raParser(document.getElementById('raInput')?.value),decDeg=decParser(document.getElementById('decInput')?.value),lat=Number(document.getElementById('latInput')?.value),lon=Number(document.getElementById('lonInput')?.value),minAltitudeDeg=Number(document.getElementById('minAltInput')?.value),sunLimitDeg=Number(document.getElementById('nightMode')?.value),date=dateFn();
-    if(!date||![raDeg,decDeg,lat,lon,minAltitudeDeg,sunLimitDeg].every(Number.isFinite))return;
+
+    const lat=Number(document.getElementById('latInput')?.value),lon=Number(document.getElementById('lonInput')?.value),minAltitudeDeg=Number(document.getElementById('minAltInput')?.value),sunLimitDeg=Number(document.getElementById('nightMode')?.value),date=dateFn();
+    if(!date||![lat,lon,minAltitudeDeg,sunLimitDeg].every(Number.isFinite))return;
     const subject=scoreSubject();if(!subject)return;
+
+    // For a loaded project use exactly the same sky coordinates as the ranking.
+    // recommendationProjectCoords() intentionally prefers the saved framing centre
+    // when the project has one; the previous Analysis path always used target RA/Dec.
+    let coords=null;
+    try{if(typeof window.recommendationProjectCoords==='function'&&typeof window.plannerProject==='function'&&window.plannerProject())coords=window.recommendationProjectCoords(subject);}catch(_){coords=null;}
+    if(!coords){
+      const raDeg=raParser(document.getElementById('raInput')?.value),decDeg=decParser(document.getElementById('decInput')?.value);
+      if(![raDeg,decDeg].every(Number.isFinite))return;
+      coords={raDeg,decDeg};
+    }
+
     let context,metadata,material;
     try{
       context=api.buildContext({date,lat,lon,astro,stepMinutes:5});
       const pool=typeof window.catalogObjectPool==='function'?window.catalogObjectPool():[];
+      // Ranking prepares signal metadata before scoring. Do the same in Analysis so
+      // an object cannot be scored once with fallback metadata and once with the
+      // indexed/supplemented catalogue metadata.
+      if(typeof metaApi.prepareSignalData==='function')await metaApi.prepareSignalData([subject],pool);
+      if(seq!==currentScoreSeq)return;
       metadata=metaApi.projectMetadata(subject,pool);
       const equipment=typeof window.getEquipment==='function'?window.getEquipment():undefined;
       material=filterApi.projectProfile(subject,equipment);
     }catch(e){console.warn('Current target score setup failed',e);return;}
     const sky=await currentScoreSky(lat,lon);if(seq!==currentScoreSeq)return;
     try{
-      const result=api.scoreTarget({raDeg,decDeg,classKey:metadata.photoClass,metadata,materialProfile:material,context,astro,sky,minAltitudeDeg,sunLimitDeg});
+      const result=api.scoreTarget({...coords,classKey:metadata.photoClass,metadata,materialProfile:material,context,astro,sky,minAltitudeDeg,sunLimitDeg});
       if(seq!==currentScoreSeq)return;
       paintCurrentScore(slot,result);
       window.__currentTargetScore=result;
@@ -388,7 +373,6 @@
 
   function applyV014Layout(){
     ensureLayoutStyle();
-    simplifyHome();
     placeRecommendationsBetweenNightAndAnalysis();
     syncRecommendationStatusVisibility();
     patchPlannerMapInfo();
